@@ -1,12 +1,18 @@
 use testauction;
 
+SET GLOBAL event_scheduler = ON;
+SET @@global.event_scheduler = ON;
+SET GLOBAL event_scheduler = 1;
+SET @@global.event_scheduler = 1;
+
 create table x_auction ( 
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
 dollars DECIMAL (60,4) UNSIGNED NOT NULL, 
 state TINYINT NOT NULL, 
 rate DECIMAL (60,4) UNSIGNED,
 creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-close_date TIMESTAMP NOT NULL) ENGINE=InnoDB;
+close_date TIMESTAMP NOT NULL,
+sold DECIMAL (60,4) UNSIGNED) ENGINE=InnoDB;
 
 create table x_user (
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -32,5 +38,6 @@ FOREIGN KEY (auction_id) REFERENCES x_auction(id),
 FOREIGN KEY (user_id) REFERENCES x_user(id)) ENGINE=InnoDB;
 
 create trigger onbid before insert on x_bid for each row update x_user set x_user.availablenaira = x_user.availablenaira - (NEW.rate*NEW.dollars) where x_user.id = NEW.user_id;
+
 
 
