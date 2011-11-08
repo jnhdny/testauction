@@ -20,6 +20,18 @@ def userDetails(email):
 	rr["dollarbalance"] = results[0][3]
 	return rr
 
+#Consolidate auction detail query
+def auctionDetails(id):
+    results = runQuery("select id, dollars, status, rate, creation_date, close_date, sold from x_auction where id =%s;", (id,))
+    rr = {}
+    rr["id"] = results[0][0]
+    rr["dollars"] = results[0][1]
+    rr["status"] = results[0][2]
+    rr["rate"] = results[0][3]
+    rr["creation_date"] = results[0][4]
+    rr["close_date"] = results[0][5]
+    rr["sold"] = results[0][6]
+    return rr
 	
 def createAuction(amount,close_date):
     c = tt.cursor()
@@ -29,10 +41,6 @@ def createAuction(amount,close_date):
     c.close()
     runQuery('''create event ev%s on schedule at %s do update x_auction set status = 1 where id = %s;''',(lrid,close_date,lrid))
     runQuery('''create event cb%s on schedule at %s + interval 1 minute do call checkbids(%s);''',(lrid,close_date,lrid))
-
-def auctionstatus(id):
-	results = runQuery("select status from x_auction where id = %s", (id,))
-	return results[0][0]
 
 def bid(email, id, amount, rate):
     nairabalance = Decimal(nairaBalance(email))
