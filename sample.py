@@ -40,4 +40,13 @@ def bid(email, id, amount, rate):
         runQuery("insert into x_bid (rate,dollars,status,auction_id,user_id) values (%s,%s,%s,%s,%s);",(rate,amount,0,id,userDetails(email)["id"]))
 
 
+def login(email,password):
+	pp = runQuery('''select password from x_user where email=%s;''', (email,))
+	try:
+		if pp[0][0] == password:
+			return 1
+	except:
+		pass
+	else:
+		return 0
 
