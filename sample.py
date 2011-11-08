@@ -48,7 +48,7 @@ def createAuction(amount,close_date):
 
 def bid(email, id, amount, rate):
     nairabalance = Decimal(nairaBalance(email))
-    if  (nairabalance >= amount*rate) and auctionstatus(id) == 0:
+    if  (nairabalance >= amount*rate) and auctionDetails(id)["status"] == 0:
         runQuery("insert into x_bid (rate,dollars,status,auction_id,user_id) values (%s,%s,%s,%s,%s);",(rate,amount,0,id,userDetails(email)["id"]))
         return 1
     else:
