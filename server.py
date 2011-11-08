@@ -79,11 +79,11 @@ Password: <input type="password" name="password" size="40" /> <br>
     @cherrypy.expose
     def auction (self,id):
         if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
+            raise cherrypy.HTTPRedirect("/signin")
         aa = sample.auctionDetails(id)
         if not aa:
             return '''Auction does not exist'''
-        if aa["status"] == "0":
+        if aa["status"] == 0:
             return '''<html>
 <body>
 <h2>Auction %s</h2>
@@ -99,15 +99,17 @@ Password: <input type="password" name="password" size="40" /> <br>
 <td>Close date:</td> <td>%s</td>
 </tr>
 </table>
-<form>
+<form method="POST" action="/bid">
 <p>
+<input type="hidden" name="id" value=%s>
 Amount:<input name="amount" type="text"><br>
+Rate:<input name="rate" type="text"><br>
 <input type="submit" value="Bid">
 </p>
 </form>
 </body>
 </html>
-''' % (id,aa["creation_date"], aa["dollars"],aa["close_date"])
+''' % (id,aa["creation_date"], aa["dollars"],aa["close_date"],id)
         else:
             return '''<html>
 <body>
@@ -126,6 +128,14 @@ Amount:<input name="amount" type="text"><br>
 </body>
 </html>''' % (id, aa["creation_date"], aa["dollars"])
 
+
+    @cherrypy.expose
+    def bid(self,id,amount,rate):
+        if not cherrypy.session.get('email'):
+            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
+        email=cherrypy.session.get('email')
+        sample.bid(email,id,amount,rate)
+        raise cherrypy.HTTPRedirect("/auction/%s"%id)
 
  
 cherrypy.quickstart(TestAuction())

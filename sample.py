@@ -47,13 +47,14 @@ def createAuction(amount,close_date):
     runQuery('''create event cb%s on schedule at %s + interval 1 minute do call checkbids(%s);''',(lrid,close_date,lrid))
 
 def bid(email, id, amount, rate):
-    nairabalance = Decimal(nairaBalance(email))
-    if  (nairabalance >= amount*rate) and auctionDetails(id)["status"] == 0:
+    availablenaira = Decimal(userDetails(email)["availablenaira"])
+    if not auctionDetails(id):
+        return 0
+    if  (availablenaira >= Decimal(amount)*Decimal(rate)) and auctionDetails(id)["status"] == 0:
         runQuery("insert into x_bid (rate,dollars,status,auction_id,user_id) values (%s,%s,%s,%s,%s);",(rate,amount,0,id,userDetails(email)["id"]))
         return 1
     else:
         return 0
-
 
 def login(email,password):
 	pp = runQuery('''select password from x_user where email=%s;''', (email,))
