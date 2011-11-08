@@ -134,8 +134,44 @@ Rate:<input name="rate" type="text"><br>
         if not cherrypy.session.get('email'):
             raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
         email=cherrypy.session.get('email')
-        sample.bid(email,id,amount,rate)
-        raise cherrypy.HTTPRedirect("/auction/%s"%id)
-
+        if sample.bid(email,id,amount,rate):
+            raise cherrypy.HTTPRedirect("/auction/%s"%id)
+        else:
+            return '''<html>Bid unsuccessful<br><a href="/auction/%s">Return to Auction</a></html>'''%id
+    
+    @cherrypy.expose
+    def account(self):
+        if not cherrypy.session.get('email'):
+            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
+        email=cherrypy.session.get('email')
+        aa = sample.userDetails(email)
+        return '''<html>
+<head>
+<title>Your Account</title>
+</head>
+<body style="font-family: verdana, arial, sans-serif;">
+<h3>Open Bids</h2>
+<p>
+</p>
+<h3>Wallet</h3>
+<table>
+<tr>
+<td>Naira:</td>
+<td>%s<td>
+<td><a href="refill">Refill</a></td>
+</tr>
+<tr>
+<td>Dollars</td>
+<td>%s<td>
+<td><a href="withdraw">Withdraw</a></td>
+</tr>
+<tr>
+<td>Available naira:</td>
+<td>%s<td>
+<td></td>
+</tr>
+</table>
+</body>
+</html>'''% (aa["nairabalance"], aa["dollarbalance"], aa["availablenaira"])
  
 cherrypy.quickstart(TestAuction())
