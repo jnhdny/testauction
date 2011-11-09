@@ -1,48 +1,65 @@
 import cherrypy
 import sample
+from mako.lookup import TemplateLookup
 
-cherrypy.config.update({'tools.sessions.on':True})
+
+class MakoHandler(cherrypy.dispatch.LateParamPageHandler):
+    """Callable which sets response.body."""
+    
+    def __init__(self, template, next_handler):
+        self.template = template
+        self.next_handler = next_handler
+    
+    def __call__(self):
+        env = globals().copy()
+        env.update(self.next_handler())
+        return self.template.render(**env)
+
+
+class MakoLoader(object):
+    
+    def __init__(self):
+        self.lookups = {}
+    
+    def __call__(self, filename, directories, module_directory=None,
+                 collection_size=-1):
+        # Find the appropriate template lookup.
+        key = (tuple(directories), module_directory)
+        try:
+            lookup = self.lookups[key]
+        except KeyError:
+            lookup = TemplateLookup(directories=directories,
+                                    module_directory=module_directory,
+                                    collection_size=collection_size,
+                                    )
+            self.lookups[key] = lookup
+        cherrypy.request.lookup = lookup
+        
+        # Replace the current handler.
+        cherrypy.request.template = t = lookup.get_template(filename)
+        cherrypy.request.handler = MakoHandler(t, cherrypy.request.handler)
+
+main = MakoLoader()
+cherrypy.tools.mako = cherrypy.Tool('on_start_resource', main)
+
+
+cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :500, 'tools.mako.directories':"templates"})
+
+
+def authorized():
+    ''' Redirects to login page if not logged on, else returns logged on user email'''
+    email = cherrypy.session.get('email')
+    if not email:
+        raise cherrypy.HTTPRedirect("/signin")
+    return email
 
 class TestAuction:
     @cherrypy.expose
+    @cherrypy.tools.mako(filename="index.html")
     def index(self):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
-        else:
-            return '''<html>
-<head>
-<title>Auctions</title>
-</head>
-<body style="font-family: verdana, arial, sans-serif;">
-<h3>Open Auctions</h2>
-<table>
-<tr>
-<td><b>ID</b></td>
-<td><b>Amount</b><td>
-<td><b>Closing Time</b></td>
-</tr>
-<tr>
-<td><a href="auctions/1">1</a></td>
-<td>$70,000.0000<td>
-<td>11 Nov, 2011 19:59</a></td>
-</tr>
-<tr>
-<tr>
-<td><a href="auctions/2">2</a></td>
-<td>$75,432.0000<td>
-<td>12 Nov, 2011 04:59</a></td>
-</tr>
-<tr>
-<tr>
-<td><a href="auctions/5">5</a></td>
-<td>$122,000.0000<td>
-<td>10 Nov, 2011 10:00</a></td>
-</tr>
-<tr>
-</table>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>''' % cherrypy.session.get('email')
+        email = authorized()
+        openauctions = sample.runQuery('''select id, dollars, close_date from x_auction where status=0''',())
+        return {'email' : email, 'openauctions' : openauctions}
     
 #Login POST function
     @cherrypy.expose
@@ -62,17 +79,9 @@ class TestAuction:
 
 #Login page    
     @cherrypy.expose
+    @cherrypy.tools.mako(filename="login.html")
     def signin(self):
-        return '''<html>
-<body style="font-family: verdana, arial, sans-serif;">
-<form method="POST" action="http://127.0.0.1:8080/login">
-<p>
-Email: <input  type="text" name="email" size="40" /> <br>
-Password: <input type="password" name="password" size="40" /> <br>
-<input type="submit" value="Login" />
-</form>
-</body>
-</html>'''
+        return {}
 
 #Auction page shows details of auction and allows bid    
     @cherrypy.expose
@@ -248,3 +257,4 @@ Amount: <input  type="text" name="amount" size="20" /> <br>
         raise cherrypy.HTTPRedirect("/")
  
 cherrypy.quickstart(TestAuction())
+
