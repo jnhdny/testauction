@@ -46,9 +46,7 @@ DROP PROCEDURE IF EXISTS checkbids;
 DELIMITER ##
 CREATE PROCEDURE checkbids(IN a_id INT)
 BEGIN
-
-	DECLARE ctr INT;
-	DECLARE var1 DECIMAL(60,4);
+	DECLARE done INT DEFAULT 0;
 	DECLARE amount_available DECIMAL(60,4);
 	DECLARE bought DECIMAL(60,4);
 	DECLARE winning_rate DECIMAL(60,4);
@@ -60,11 +58,12 @@ BEGIN
 	DECLARE auction_id_var INT(11);
 	DECLARE user_id_var INT(11);
 	DECLARE bid_cur CURSOR FOR SELECT * FROM testauction.x_bid WHERE auction_id = a_id ORDER BY rate DESC, bid_date;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 	
 	OPEN bid_cur;
 	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
-	SET var1 = amount_available;
 	SET bought = 0;
+	
 	firstpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
 		IF dollars_var >= amount_available THEN
@@ -76,12 +75,16 @@ BEGIN
 		SET amount_available = amount_available - bought;
 		IF amount_available = 0 THEN LEAVE firstpass;
 		END IF;
+		IF done THEN LEAVE firstpass;
+		END IF;
 	END LOOP firstpass;
 	CLOSE bid_cur;
 	
-	
+
+	SET done = 0;
 	OPEN bid_cur;
-	SET amount_available = var1;
+	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
+	SET bought = 0; 
 	secondpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
 		IF dollars_var >= amount_available THEN
@@ -98,6 +101,8 @@ BEGIN
 		END IF;
 		SET amount_available = amount_available - bought;
 		IF amount_available = 0 THEN LEAVE secondpass;
+		END IF;
+		IF done THEN LEAVE secondpass;
 		END IF;
 	END LOOP secondpass;
 	CLOSE bid_cur;
