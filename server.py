@@ -44,7 +44,7 @@ class TestAuction:
 </body>
 </html>''' % cherrypy.session.get('email')
     
-#Login function called by POST
+#Login POST function
     @cherrypy.expose
     def login(self,email,password):
         d = cherrypy.request.headers
@@ -54,7 +54,7 @@ class TestAuction:
         else:
             return "Login failed"
 
-#Logout, redirects to home page
+#Logout, redirects to home page and to Login page
     @cherrypy.expose
     def logout(self):
         cherrypy.session.delete()
@@ -79,6 +79,7 @@ Password: <input type="password" name="password" size="40" /> <br>
     def auction (self,id):
         if not cherrypy.session.get('email'):
             raise cherrypy.HTTPRedirect("/signin")
+        email=cherrypy.session.get('email')
         aa = sample.auctionDetails(id)
         if not aa:
             return '''Auction does not exist'''
@@ -106,10 +107,11 @@ Rate:<input name="rate" type="text"><br>
 <input type="submit" value="Bid">
 </p>
 </form>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
 </body>
 </html>
-''' % (id,aa["creation_date"], aa["dollars"],aa["close_date"],id)
-        else:
+''' % (id,aa["creation_date"], aa["dollars"],aa["close_date"],id,email)
+        if aa["status"] == 1:
             return '''<html>
 <body>
 <h2>Auction %s</h2>
@@ -123,9 +125,28 @@ Rate:<input name="rate" type="text"><br>
 </tr>
 <tr>
 </table>
-<p> Auction is closed </p>
+<p> Auction is closed for bidding. <br>Winning bids are currently being calculated. <br>Please wait. </p>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
 </body>
-</html>''' % (id, aa["creation_date"], aa["dollars"])
+</html>''' % (id, aa["creation_date"], aa["dollars"],email)
+        if aa["status"] == 2:
+            return '''<html>
+<body>
+<h2>Auction %s</h2>
+<table>
+<tr>
+<td>Creation date:</td> <td>%s</td>
+</tr>
+<tr>
+<tr>
+<td>Amount:</td> <td>$%s</td>
+</tr>
+<tr>
+</table>
+<p> $%s dollars were sold at N%s to the dollar </p>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
+</body>
+</html>''' % (id, aa["creation_date"], aa["dollars"], aa["sold"], aa["rate"],email)
 
 
     @cherrypy.expose
@@ -170,8 +191,9 @@ Rate:<input name="rate" type="text"><br>
 <td></td>
 </tr>
 </table>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
 </body>
-</html>'''% (aa["nairabalance"], aa["dollarbalance"], aa["availablenaira"])
+</html>'''% (aa["nairabalance"], aa["dollarbalance"], aa["availablenaira"],email)
 
     @cherrypy.expose
     def refill(self):
@@ -189,6 +211,7 @@ Amount: <input  type="text" name="amount" size="20" /> <br>
 <input type="submit" value="Reload" />
 </p>
 </form>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
 </body>
 </html>'''
     
@@ -199,5 +222,29 @@ Amount: <input  type="text" name="amount" size="20" /> <br>
         email=cherrypy.session.get('email')
         sample.nairaReload(email,amount)
         raise cherrypy.HTTPRedirect("/account")
+    
+    @cherrypy.expose
+    def createauction(self):
+        if not cherrypy.session.get('email'):
+            raise cherrypy.HTTPRedirect("/signin")
+        email=cherrypy.session.get('email')
+        return'''<html>
+<body>
+<h2>Create Auction</h2>
+<form method="POST" action="/create">
+  <p>Dollars on sale: <input type="text" name="amount"></p>
+  <p>Auction ends at: <input type="datetime" name="closedate"></p>
+  <input type="submit" value="Create">
+</form>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
+</body>
+</html>'''%(email,)
+
+    @cherrypy.expose
+    def create(self,amount,closedate):
+        if not cherrypy.session.get('email'):
+            raise cherrypy.HTTPRedirect("/signin")
+        sample.createAuction(amount,closedate)
+        raise cherrypy.HTTPRedirect("/")
  
 cherrypy.quickstart(TestAuction())

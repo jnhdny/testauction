@@ -49,6 +49,7 @@ BEGIN
 
 	DECLARE ctr INT;
 	DECLARE var1 DECIMAL(60,4);
+	DECLARE amount_available DECIMAL(60,4);
 	DECLARE bought DECIMAL(60,4);
 	DECLARE winning_rate DECIMAL(60,4);
 	DECLARE id_var INT(11);
@@ -59,21 +60,51 @@ BEGIN
 	DECLARE auction_id_var INT(11);
 	DECLARE user_id_var INT(11);
 	DECLARE bid_cur CURSOR FOR SELECT * FROM testauction.x_bid WHERE auction_id = a_id ORDER BY rate DESC, bid_date;
+	
 	OPEN bid_cur;
 	SET ctr = 0;
-	SET var1 = 0;
+	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
+	SET var1 = amount_available;
 	SET bought = 0;
-	label1: LOOP
+	firstpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
 		-- first record sets the winning rate
-		IF ctr = 0 THEN
+		-- IF ctr = 0 THEN
+		-- 	SET winning_rate = rate_var;
+		-- END IF;
+		IF dollars_var >= amount_available THEN
+			SET bought = amount_available;
 			SET winning_rate = rate_var;
-			SET var1 = (SELECT dollars FROM testauction.x_auction where id = a_id);
+			-- UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) - (bought*winning_rate), nairabalance = nairabalance - (bought*winning_rate), dollarbalance=dollarbalance+bought where id = user_id_var;
+			-- IF dollars_var = var1 THEN
+			-- 	UPDATE x_bid SET status = 1 where id=id_var;
+			-- ELSE UPDATE x_bid SET status = 2 where id=id_var;
+			-- END IF;
+		ELSE
+			SET bought = dollars_var;
+			-- UPDATE x_user SET nairabalance = nairabalance - (bought*winning_rate), dollarbalance= dollarbalance+bought where id = user_id_var;
+			-- UPDATE x_bid SET status = 1 where id=id_var;
 		END IF;
-		IF dollars_var >= var1 THEN
-			SET bought = var1;
+		SET amount_available = amount_available - bought;
+		-- SET ctr = ctr+1;
+		IF amount_available = 0 THEN LEAVE firstpass;
+		END IF;
+	END LOOP firstpass;
+	CLOSE bid_cur;
+	
+	
+	OPEN bid_cur;
+	SET amount_available = var1;
+	secondpass: LOOP
+		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
+		-- first record sets the winning rate
+		-- IF ctr = 0 THEN
+		--	SET var1 = (SELECT dollars FROM testauction.x_auction where id = a_id);
+		-- END IF;
+		IF dollars_var >= amount_available THEN
+			SET bought = amount_available;
 			UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) - (bought*winning_rate), nairabalance = nairabalance - (bought*winning_rate), dollarbalance=dollarbalance+bought where id = user_id_var;
-			IF dollars_var = var1 THEN
+			IF dollars_var = amount_available THEN
 				UPDATE x_bid SET status = 1 where id=id_var;
 			ELSE UPDATE x_bid SET status = 2 where id=id_var;
 			END IF;
@@ -82,13 +113,14 @@ BEGIN
 			UPDATE x_user SET nairabalance = nairabalance - (bought*winning_rate), dollarbalance= dollarbalance+bought where id = user_id_var;
 			UPDATE x_bid SET status = 1 where id=id_var;
 		END IF;
-		SET var1 = var1 - bought;
-		SET ctr = ctr+1;
-		IF var1 = 0 THEN LEAVE label1;
+		SET amount_available = amount_available - bought;
+		-- SET ctr = ctr+1;
+		IF amount_available = 0 THEN LEAVE secondpass;
 		END IF;
-	END LOOP label1;
+	END LOOP secondpass;
 	CLOSE bid_cur;
-	UPDATE x_auction SET status=2, rate=winning_rate, sold=dollars-var1 WHERE id = a_id;
+	
+	UPDATE x_auction SET status=2, rate=winning_rate, sold=dollars-amount_available WHERE id = a_id;
 END##
 
 
