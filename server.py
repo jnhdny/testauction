@@ -7,7 +7,7 @@ class TestAuction:
     @cherrypy.expose
     def index(self):
         if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
+            raise cherrypy.HTTPRedirect("/signin")
         else:
             return '''<html>
 <head>
@@ -65,7 +65,7 @@ class TestAuction:
     def signin(self):
         return '''<html>
 <body style="font-family: verdana, arial, sans-serif;">
-<form method="POST" action="http://127.0.0.1:8080/login">
+<form method="POST" action="/login">
 <p>
 Email: <input  type="text" name="email" size="40" /> <br>
 Password: <input type="password" name="password" size="40" /> <br>
@@ -152,7 +152,7 @@ Rate:<input name="rate" type="text"><br>
     @cherrypy.expose
     def bid(self,id,amount,rate):
         if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
+            raise cherrypy.HTTPRedirect("/signin")
         email=cherrypy.session.get('email')
         if sample.bid(email,id,amount,rate):
             raise cherrypy.HTTPRedirect("/auction/%s"%id)
@@ -205,7 +205,7 @@ Rate:<input name="rate" type="text"><br>
 </head>
 <body style="font-family: verdana, arial, sans-serif;">
 <p>
-<form method="POST" action="http://127.0.0.1:8080/nairareload">
+<form method="POST" action="/nairareload">
 <p>
 Amount: <input  type="text" name="amount" size="20" /> <br>
 <input type="submit" value="Reload" />
