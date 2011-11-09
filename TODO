@@ -1,3 +1,4 @@
+0. Fix algorithm in checkbids MySQL procedure
 1. Home page still does not show open auctions
 2. A create auction page
 3. A sign up page
