@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>Auctions</title>
+</head>
+<body style="font-family: verdana, arial, sans-serif;">
+<h3>Open Auctions</h2>
+<table>
+<tr>
+<td><b>ID</b></td>
+<td><b>Amount</b><td>
+<td><b>Closing Time</b></td>
+</tr>
+%	for a in openauctions:
+		<tr>
+		<td><a href="auction/${a[0]}">${a[0]}</a></td>
+		<td>${a[1]}<td>
+		<td>${a[2]}</td>
+		</tr>
+%	endfor
+</table>
+<p>Logged in as <a href="/account">${email}</a> <a href="/logout">Logout</a></p>
+</body>
+</html>
