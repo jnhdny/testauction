@@ -2,7 +2,6 @@ import cherrypy
 import sample
 from mako.lookup import TemplateLookup
 
-
 class MakoHandler(cherrypy.dispatch.LateParamPageHandler):
     """Callable which sets response.body."""
     
@@ -14,7 +13,6 @@ class MakoHandler(cherrypy.dispatch.LateParamPageHandler):
         env = globals().copy()
         env.update(self.next_handler())
         return self.template.render(**env)
-
 
 class MakoLoader(object):
     
@@ -42,9 +40,7 @@ class MakoLoader(object):
 main = MakoLoader()
 cherrypy.tools.mako = cherrypy.Tool('on_start_resource', main)
 
-
 cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :500, 'tools.mako.directories':"templates"})
-
 
 def authorized():
     ''' Redirects to login page if not logged on, else returns logged on user email'''
@@ -83,86 +79,17 @@ class TestAuction:
     def signin(self):
         return {}
 
-#Auction page shows details of auction and allows bid    
     @cherrypy.expose
+    @cherrypy.tools.mako(filename="auction.html")
     def auction (self,id):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("/signin")
-        email=cherrypy.session.get('email')
+        '''Auction page shows details of auction and allows bid if auction is open'''
+        email = authorized()
         aa = sample.auctionDetails(id)
-        if not aa:
-            return '''Auction does not exist'''
-        if aa["status"] == 0:
-            return '''<html>
-<body>
-<h2>Auction %s</h2>
-<table>
-<tr>
-<td>Creation date:</td> <td>%s</td>
-</tr>
-<tr>
-<tr>
-<td>Amount:</td> <td>$%s</td>
-</tr>
-<tr>
-<td>Close date:</td> <td>%s</td>
-</tr>
-</table>
-<form method="POST" action="/bid">
-<p>
-<input type="hidden" name="id" value=%s>
-Amount:<input name="amount" type="text"><br>
-Rate:<input name="rate" type="text"><br>
-<input type="submit" value="Bid">
-</p>
-</form>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>
-''' % (id,aa["creation_date"], aa["dollars"],aa["close_date"],id,email)
-        if aa["status"] == 1:
-            return '''<html>
-<body>
-<h2>Auction %s</h2>
-<table>
-<tr>
-<td>Creation date:</td> <td>%s</td>
-</tr>
-<tr>
-<tr>
-<td>Amount:</td> <td>$%s</td>
-</tr>
-<tr>
-</table>
-<p> Auction is closed for bidding. <br>Winning bids are currently being calculated. <br>Please wait. </p>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>''' % (id, aa["creation_date"], aa["dollars"],email)
-        if aa["status"] == 2:
-            return '''<html>
-<body>
-<h2>Auction %s</h2>
-<table>
-<tr>
-<td>Creation date:</td> <td>%s</td>
-</tr>
-<tr>
-<tr>
-<td>Amount:</td> <td>$%s</td>
-</tr>
-<tr>
-</table>
-<p> $%s dollars were sold at N%s to the dollar </p>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>''' % (id, aa["creation_date"], aa["dollars"], aa["sold"], aa["rate"],email)
-
+        return {'email':email, 'auction': aa}
 
     @cherrypy.expose
     def bid(self,id,amount,rate):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
-        email=cherrypy.session.get('email')
+        email = authorized()
         if sample.bid(email,id,amount,rate):
             raise cherrypy.HTTPRedirect("/auction/%s"%id)
         else:
@@ -226,9 +153,8 @@ Amount: <input  type="text" name="amount" size="20" /> <br>
     
     @cherrypy.expose
     def nairareload(self,amount):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("/signin")
-        email=cherrypy.session.get('email')
+        '''Takes amount to add via POST. Also accepts negative numbers.'''
+        email = authorized()
         sample.nairaReload(email,amount)
         raise cherrypy.HTTPRedirect("/account")
     
