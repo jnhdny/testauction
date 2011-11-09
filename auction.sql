@@ -63,17 +63,15 @@ BEGIN
 	OPEN bid_cur;
 	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
 	SET bought = 0;
+	SET winning_rate=0;
 	
 	firstpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
-		IF dollars_var >= amount_available THEN
-			SET bought = amount_available;
+		IF dollars_var > amount_available THEN LEAVE firstpass;
 		ELSE
 			SET bought = dollars_var;
-		END IF;
-		SET winning_rate = rate_var;
-		SET amount_available = amount_available - bought;
-		IF amount_available = 0 THEN LEAVE firstpass;
+			SET winning_rate = rate_var;
+			SET amount_available = amount_available - bought;
 		END IF;
 		IF done THEN LEAVE firstpass;
 		END IF;
@@ -87,23 +85,23 @@ BEGIN
 	SET bought = 0; 
 	secondpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
-		IF dollars_var >= amount_available THEN
-			SET bought = amount_available;
-			UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) - (bought*winning_rate), nairabalance = nairabalance - (bought*winning_rate), dollarbalance=dollarbalance+bought where id = user_id_var;
-			IF dollars_var = amount_available THEN
+		IF rate_var >= winning_rate THEN
+			SET amount_available = amount_available - dollars_var;
+			IF amount_available >= 0 THEN
+				UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) - (dollars_var*winning_rate), nairabalance = nairabalance - (dollars_var*winning_rate), dollarbalance=dollarbalance+dollars_var where id = user_id_var;
 				UPDATE x_bid SET status = 1 where id=id_var;
-			ELSE UPDATE x_bid SET status = 2 where id=id_var;
+				ITERATE secondpass;
+			ELSE
+				UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
+				UPDATE x_bid SET status = 2 where id=id_var;
+				ITERATE secondpass;
 			END IF;
 		ELSE
-			SET bought = dollars_var;
-			UPDATE x_user SET nairabalance = nairabalance - (bought*winning_rate), dollarbalance= dollarbalance+bought where id = user_id_var;
-			UPDATE x_bid SET status = 1 where id=id_var;
-		END IF;
-		SET amount_available = amount_available - bought;
-		IF amount_available = 0 THEN LEAVE secondpass;
-		END IF;
+		    UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
+			UPDATE x_bid SET status = 2 where id=id_var;
+		END IF;			
 		IF done THEN LEAVE secondpass;
-		END IF;
+		END iF;
 	END LOOP secondpass;
 	CLOSE bid_cur;
 	
