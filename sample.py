@@ -42,6 +42,7 @@ def createAuction(amount,close_date):
     lrid = c.lastrowid
     tt.commit()
     c.close()
+    #This event closes the auction at close_date
     runQuery('''create event ev%s on schedule at %s do update x_auction set status = 1 where id = %s;''',(lrid,close_date,lrid))
     #The following event computes bid winners and updates their account balances 1 minute after the bid ends
     runQuery('''create event cb%s on schedule at %s + interval 1 minute do call checkbids(%s);''',(lrid,close_date,lrid))
@@ -65,4 +66,7 @@ def login(email,password):
 		pass
 	else:
 		return 0
+
+def nairaReload(email,amount):
+    runQuery('''update x_user set availablenaira=availablenaira+%s, nairabalance=nairabalance+%s where email=%s''', (amount,amount,email))
 

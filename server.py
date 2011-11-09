@@ -40,8 +40,7 @@ class TestAuction:
 </tr>
 <tr>
 </table>
-<h3><a href="/past">Past Auction Results</a></h3>
-<p>Logged in as %s <a href="/logout">Logout</a></p>
+<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
 </body>
 </html>''' % cherrypy.session.get('email')
     
@@ -142,7 +141,7 @@ Rate:<input name="rate" type="text"><br>
     @cherrypy.expose
     def account(self):
         if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("http://127.0.0.1:8080/signin")
+            raise cherrypy.HTTPRedirect("/signin")
         email=cherrypy.session.get('email')
         aa = sample.userDetails(email)
         return '''<html>
@@ -158,12 +157,12 @@ Rate:<input name="rate" type="text"><br>
 <tr>
 <td>Naira:</td>
 <td>%s<td>
-<td><a href="refill">Refill</a></td>
+<td><a href="/refill">Refill</a></td>
 </tr>
 <tr>
 <td>Dollars</td>
 <td>%s<td>
-<td><a href="withdraw">Withdraw</a></td>
+<td><a href="./#">Withdraw</a></td>
 </tr>
 <tr>
 <td>Available naira:</td>
@@ -173,5 +172,32 @@ Rate:<input name="rate" type="text"><br>
 </table>
 </body>
 </html>'''% (aa["nairabalance"], aa["dollarbalance"], aa["availablenaira"])
+
+    @cherrypy.expose
+    def refill(self):
+        if not cherrypy.session.get('email'):
+            raise cherrypy.HTTPRedirect("/signin")
+        return '''<html>
+<head>
+<title>Reload Naira</title>
+</head>
+<body style="font-family: verdana, arial, sans-serif;">
+<p>
+<form method="POST" action="http://127.0.0.1:8080/nairareload">
+<p>
+Amount: <input  type="text" name="amount" size="20" /> <br>
+<input type="submit" value="Reload" />
+</p>
+</form>
+</body>
+</html>'''
+    
+    @cherrypy.expose
+    def nairareload(self,amount):
+        if not cherrypy.session.get('email'):
+            raise cherrypy.HTTPRedirect("/signin")
+        email=cherrypy.session.get('email')
+        sample.nairaReload(email,amount)
+        raise cherrypy.HTTPRedirect("/account")
  
 cherrypy.quickstart(TestAuction())
