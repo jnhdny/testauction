@@ -41,7 +41,6 @@ main = MakoLoader()
 cherrypy.tools.mako = cherrypy.Tool('on_start_resource', main)
 
 cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :500, 'tools.mako.directories':"templates"})
-
 def authorized():
     ''' Redirects to login page if not logged on, else returns logged on user email'''
     email = cherrypy.session.get('email')
@@ -128,6 +127,27 @@ class TestAuction:
             raise cherrypy.HTTPRedirect("/signin")
         sample.createAuction(amount,closedate)
         raise cherrypy.HTTPRedirect("/")
- 
+        
+    @cherrypy.tools.mako(filename="signup.html")
+    @cherrypy.expose
+    def signup(self):
+        return {}
+    
+    @cherrypy.expose
+    def register(self,firstname,lastname,email,password,c_password):
+    	if password == c_password:
+    	#Will eventually validate email here as well
+    	    if sample.createUser(firstname,lastname,email,password):
+    	        self.login(email,password)
+    	        raise cherrypy.HTTPRedirect("/")
+    	    else:
+    	        return '''Account with this email exists'''
+    	else:
+    	    return "User account creation failed"
+
+def defaulterror(status, message, traceback, version):
+    return "An Error has occurred"
+cherrypy.config.update({'error_page.default': defaulterror})
+
 cherrypy.quickstart(TestAuction())
 

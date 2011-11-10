@@ -4,7 +4,10 @@ tt = pymysql.connect("127.0.0.1","root","","testauction")
 
 def runQuery(query, parameters):
 	c = tt.cursor()
-	c.execute(query, parameters)
+	try:
+	    c.execute(query, parameters)
+	except:
+	    raise
 	results = c.fetchall()
 	tt.commit()
 	c.close()
@@ -12,9 +15,9 @@ def runQuery(query, parameters):
 
 #Consolidate user detail queries
 def userDetails(email):
-	results = runQuery("select id, availablenaira,nairabalance,dollarbalance from x_user where email =%s;", (email,))
+	results = runQuery("select id, availablenaira,nairabalance,dollarbalance,email from x_user where email =%s;", (email,))
 	# Courtesy http://stackoverflow.com/questions/209840/map-two-lists-into-a-dictionary-in-python
-	return dict(zip(["id", "availablenaira", "nairabalance", "dollarbalance"],results[0]))
+	return dict(zip(["id", "availablenaira", "nairabalance", "dollarbalance", "email"],results[0]))
 
 #Consolidate auction detail query
 def auctionDetails(id):
@@ -23,6 +26,9 @@ def auctionDetails(id):
         return dict(zip(["id","dollars","status","rate","creation_date","close_date","sold"],results[0]))
     except:
         return 0
+
+def bidDetails(auction_id, email):
+    results = runQuery('''select dollars, rate, bid_date, status from x_bid,x_user where x_bid = %s and x_user.email=%s''' % (auction_id,email))
 	
 def createAuction(amount,close_date):
     c = tt.cursor()
@@ -58,5 +64,15 @@ def login(email,password):
 
 def nairaReload(email,amount):
     runQuery('''update x_user set availablenaira=availablenaira+%s, nairabalance=nairabalance+%s where email=%s''', (amount,amount,email))
+
+def createUser(firstname,lastname,email,password):
+    '''return 0 if user creation fails because of Duplicate entry'''
+    try:
+        runQuery('''insert into x_user (firstname,lastname,email,password) values (%s,%s,%s,%s)''',(firstname,lastname,email,password))
+    except:
+        return 0
+    return 1
+
+
 
     
