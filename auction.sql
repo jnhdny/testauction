@@ -77,7 +77,6 @@ BEGIN
 		END IF;
 	END LOOP firstpass;
 	CLOSE bid_cur;
-	
 
 	SET done = 0;
 	OPEN bid_cur;

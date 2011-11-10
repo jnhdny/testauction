@@ -85,7 +85,9 @@ class TestAuction:
         '''Auction page shows details of auction and allows bid if auction is open'''
         email = authorized()
         aa = sample.auctionDetails(id)
-        return {'email':email, 'auction': aa}
+        if not aa:
+            return {'email':email,'exists':0}
+        return {'email':email, 'auction': aa, 'exists':1}
 
     @cherrypy.expose
     def bid(self,id,amount,rate):
@@ -95,41 +97,12 @@ class TestAuction:
         else:
             return '''<html>Bid unsuccessful<br><a href="/auction/%s">Return to Auction</a></html>'''%id
     
+    @cherrypy.tools.mako(filename="account.html")
     @cherrypy.expose
     def account(self):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("/signin")
-        email=cherrypy.session.get('email')
+        email=authorized()
         aa = sample.userDetails(email)
-        return '''<html>
-<head>
-<title>Your Account</title>
-</head>
-<body style="font-family: verdana, arial, sans-serif;">
-<h3>Open Bids</h2>
-<p>
-</p>
-<h3>Wallet</h3>
-<table>
-<tr>
-<td>Naira:</td>
-<td>%s<td>
-<td><a href="/refill">Refill</a></td>
-</tr>
-<tr>
-<td>Dollars</td>
-<td>%s<td>
-<td><a href="./#">Withdraw</a></td>
-</tr>
-<tr>
-<td>Available naira:</td>
-<td>%s<td>
-<td></td>
-</tr>
-</table>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>'''% (aa["nairabalance"], aa["dollarbalance"], aa["availablenaira"],email)
+        return {'user':aa}
 
     @cherrypy.expose
     def refill(self):

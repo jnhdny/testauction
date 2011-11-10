@@ -1,0 +1,36 @@
+<html>
+<body>
+%	if not exists:
+		<p> Auction does not exist </p>
+%	else:
+		<h2>Auction ${auction["id"]}</h2>
+		<table>
+		<tr>
+		<td>Creation date:</td> <td> ${auction["creation_date"]}</td>
+		</tr>
+		<tr>
+		<tr>
+		<td>Amount:</td> <td>${auction["dollars"]}</td>
+		</tr>
+		<tr>
+		<td>Close date:</td> <td>${auction["close_date"]}</td>
+		</tr>
+		</table>
+		% 	if auction["status"] == 0:
+				<form method="POST" action="/bid">
+				<p>
+				<input type="hidden" name="id" value=${auction["id"]}>
+				Amount:<input name="amount" type="text"><br>
+				Rate:<input name="rate" type="text"><br>
+				<input type="submit" value="Bid">
+				</p>
+				</form>
+		%	elif auction["status"] == 1:
+				<p> Winning bids are being computed. Please wait. </p>
+		%	else:
+				<p>$${auction["sold"]} was sold at N${auction["rate"]} to the dollar. </p>
+		%	endif	
+%	endif
+<p>Logged in as <a href="/account">${email}</a> <a href="/logout">Logout</a></p>
+</body>
+</html>
