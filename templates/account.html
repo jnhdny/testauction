@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Your Account</title>
+</head>
+<body style="font-family: verdana, arial, sans-serif;">
+<h3>Wallet</h3>
+<table>
+<tr>
+<td>Naira:</td>
+<td>${user["nairabalance"]}<td>
+<td><a href="/refill">Refill</a></td>
+</tr>
+<tr>
+<td>Dollars</td>
+<td>${user["dollarbalance"]}<td>
+<td><a href="./#">Withdraw</a></td>
+</tr>
+<tr>
+<td>Available naira:</td>
+<td>${user["availablenaira"]}<td>
+<td></td>
+</tr>
+</table>
+<p>Logged in as <a href="/account">${user["email"]}</a> <a href="/logout">Logout</a></p>
+</body>
+</html>
