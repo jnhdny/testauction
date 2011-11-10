@@ -1,4 +1,4 @@
-import cherrypy
+import cherrypy,os.path
 import sample
 from mako.lookup import TemplateLookup
 
@@ -41,6 +41,7 @@ main = MakoLoader()
 cherrypy.tools.mako = cherrypy.Tool('on_start_resource', main)
 
 cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :500, 'tools.mako.directories':"templates"})
+
 def authorized():
     ''' Redirects to login page if not logged on, else returns logged on user email'''
     email = cherrypy.session.get('email')
