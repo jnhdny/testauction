@@ -48,7 +48,6 @@ CREATE PROCEDURE checkbids(IN a_id INT)
 BEGIN
 	DECLARE done INT DEFAULT 0;
 	DECLARE amount_available DECIMAL(60,4);
-	DECLARE bought DECIMAL(60,4);
 	DECLARE winning_rate DECIMAL(60,4);
 	DECLARE id_var INT(11);
 	DECLARE rate_var DECIMAL(60,4);
@@ -62,16 +61,14 @@ BEGIN
 	
 	OPEN bid_cur;
 	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
-	SET bought = 0;
 	SET winning_rate=0;
 	
 	firstpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
 		IF dollars_var > amount_available THEN LEAVE firstpass;
 		ELSE
-			SET bought = dollars_var;
 			SET winning_rate = rate_var;
-			SET amount_available = amount_available - bought;
+			SET amount_available = amount_available - dollars_var;
 		END IF;
 		IF done THEN LEAVE firstpass;
 		END IF;
@@ -80,10 +77,11 @@ BEGIN
 
 	SET done = 0;
 	OPEN bid_cur;
-	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
-	SET bought = 0; 
+	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id); 
 	secondpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
+		IF done THEN LEAVE secondpass;
+		END iF;
 		IF rate_var >= winning_rate THEN
 			SET amount_available = amount_available - dollars_var;
 			IF amount_available >= 0 THEN
@@ -98,6 +96,7 @@ BEGIN
 		ELSE
 		    UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
 			UPDATE x_bid SET status = 2 where id=id_var;
+			ITERATE secondpass;
 		END IF;			
 		IF done THEN LEAVE secondpass;
 		END iF;
