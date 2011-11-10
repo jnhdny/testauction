@@ -106,23 +106,8 @@ class TestAuction:
 
     @cherrypy.expose
     def refill(self):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("/signin")
-        return '''<html>
-<head>
-<title>Reload Naira</title>
-</head>
-<body style="font-family: verdana, arial, sans-serif;">
-<p>
-<form method="POST" action="http://127.0.0.1:8080/nairareload">
-<p>
-Amount: <input  type="text" name="amount" size="20" /> <br>
-<input type="submit" value="Reload" />
-</p>
-</form>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>'''
+        email = authorized()
+        return {'email':email}
     
     @cherrypy.expose
     def nairareload(self,amount):
@@ -131,22 +116,11 @@ Amount: <input  type="text" name="amount" size="20" /> <br>
         sample.nairaReload(email,amount)
         raise cherrypy.HTTPRedirect("/account")
     
+    @cherrypy.tools.mako(filename="createauction.html")
     @cherrypy.expose
     def createauction(self):
-        if not cherrypy.session.get('email'):
-            raise cherrypy.HTTPRedirect("/signin")
-        email=cherrypy.session.get('email')
-        return'''<html>
-<body>
-<h2>Create Auction</h2>
-<form method="POST" action="/create">
-  <p>Dollars on sale: <input type="text" name="amount"></p>
-  <p>Auction ends at: <input type="datetime" name="closedate"></p>
-  <input type="submit" value="Create">
-</form>
-<p>Logged in as <a href="/account">%s</a> <a href="/logout">Logout</a></p>
-</body>
-</html>'''%(email,)
+        email = authorized()
+        return {'email': email}
 
     @cherrypy.expose
     def create(self,amount,closedate):

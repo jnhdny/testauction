@@ -1,5 +1,3 @@
-1. Home page still does not show open auctions
-2. A create auction page
-3. A sign up page
-4. Move to templating system
+1. A sign up page
 5. Get a proper Dispatcher??
+6. Passwords stored in clear text in MySQL database. Login can be brute forced. No account lockouts implemented.
