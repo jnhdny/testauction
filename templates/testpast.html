@@ -6,6 +6,7 @@
         padding-top: 60px;
       }
     </style>
+    <title>Past Auctions</title>
 </head>
 <body>
     <div class="topbar">
@@ -34,13 +35,15 @@
 						<td><strong>Closing Time</strong></td>
 						<td><strong>Amount Offered</strong></td>
 						<td><strong>Amount Sold</strong></td>
+						<td><strong>Rate</strong></td>
 					</tr>
 					</thead>
 					%	for a in oldauctions:
 							<tr>
-							<td>${a[0]}</td>
-							<td>${a[1]}</td>
-							<td>${a[2]}</td>
+							<td><a href = "/auction/${a["id"]}">${a["close_date"]}</a></td>
+							<td>${a["dollars"]}</td>
+							<td>${a["sold"]}</td>
+							<td>${a["rate"]}</td>
 							</tr>
 					%	endfor
 				</table>
