@@ -5,11 +5,16 @@ SET @@global.event_scheduler = ON;
 SET GLOBAL event_scheduler = 1;
 SET @@global.event_scheduler = 1;
 
+DROP TRIGGER IF EXISTS onbid;
+DROP TABLE IF EXISTS x_bid;
+DROP TABLE IF EXISTS x_auction;
+DROP TABLE IF EXISTS x_user;
+
 create table x_auction ( 
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
 dollars DECIMAL (60,4) UNSIGNED NOT NULL DEFAULT 0, 
 status TINYINT NOT NULL, 
-rate DECIMAL (60,4) UNSIGNED,
+rate DECIMAL (60,4) UNSIGNED DEFAULT 0,
 creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 close_date TIMESTAMP NOT NULL,
 sold DECIMAL (60,4) UNSIGNED DEFAULT 0) ENGINE=InnoDB;
@@ -20,9 +25,9 @@ firstname VARCHAR(30) NOT NULL,
 lastname VARCHAR(30) NOT NULL,
 email VARCHAR(30) NOT NULL,
 password VARCHAR(30) NOT NULL,
-nairabalance DECIMAL (60,4) UNSIGNED,
-dollarbalance DECIMAL (60,4) UNSIGNED,
-availablenaira DECIMAL (60,4) UNSIGNED,
+nairabalance DECIMAL (60,4) UNSIGNED DEFAULT 0,
+dollarbalance DECIMAL (60,4) UNSIGNED DEFAULT 0,
+availablenaira DECIMAL (60,4) UNSIGNED DEFAULT 0,
 UNIQUE (email)
 ) ENGINE=InnoDB;
 
