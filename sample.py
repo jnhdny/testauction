@@ -1,6 +1,7 @@
 import pymysql
 from decimal import *
 tt = pymysql.connect("127.0.0.1","root","","testauction")
+CBN_ACCOUNT = "cbngov@cbn.gov"
 
 def runQuery(query, parameters):
 	c = tt.cursor()
@@ -31,16 +32,20 @@ def bidDetails(auction_id, email):
     results = runQuery('''select dollars, rate, bid_date, status from x_bid,x_user where x_bid = %s and x_user.email=%s''' % (auction_id,email))
 	
 def createAuction(amount,close_date):
-    c = tt.cursor()
-    c.execute('''insert into x_auction (dollars,close_date) values (%s,%s);''',(amount,close_date))
-    lrid = c.lastrowid
-    tt.commit()
-    c.close()
-    #This event closes the auction at close_date
-    runQuery('''create event ev%s on schedule at %s do update x_auction set status = 1 where id = %s;''',(lrid,close_date,lrid))
-    #The following event computes bid winners and updates their account balances 1 minute after the bid ends
-    runQuery('''create event cb%s on schedule at %s + interval 1 minute do call checkbids(%s);''',(lrid,close_date,lrid))
-    return 1
+    dav = runQuery('''select dollarbalance from x_user where email=%s''',(CBN_ACCOUNT))[0][0]
+    if Decimal(amount) <= dav:
+        c = tt.cursor()
+        c.execute('''insert into x_auction (dollars,close_date) values (%s,%s);''',(amount,close_date))
+        lrid = c.lastrowid
+        tt.commit()
+        c.close()
+        #This event closes the auction at close_date
+        runQuery('''create event ev%s on schedule at %s do update x_auction set status = 1 where id = %s;''',(lrid,close_date,lrid))
+        #The following event computes bid winners and updates their account balances 1 minute after the bid ends
+        runQuery('''create event cb%s on schedule at %s + interval 1 minute do call checkbids(%s);''',(lrid,close_date,lrid))
+        return 1
+    else:
+        return 0
 
 def bid(email, id, amount, rate):
     availablenaira = Decimal(userDetails(email)["availablenaira"])
@@ -64,6 +69,9 @@ def login(email,password):
 
 def nairaReload(email,amount):
     runQuery('''update x_user set availablenaira=availablenaira+%s, nairabalance=nairabalance+%s where email=%s''', (amount,amount,email))
+
+def dollarReload(email,amount):
+    runQuery('''update x_user set dollarbalance=dollarbalance+%s where email=%s''', (amount,email))
 
 def createUser(firstname,lastname,email,password):
     '''return 0 if user creation fails because of Duplicate entry'''

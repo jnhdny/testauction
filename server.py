@@ -1,7 +1,9 @@
 import cherrypy,os.path
 import sample
 from mako.lookup import TemplateLookup
+from decimal import *
 current_dir = os.path.dirname(os.path.abspath(__file__))
+CBN_ACCOUNT = "cbngov@cbn.gov"
 
 class MakoHandler(cherrypy.dispatch.LateParamPageHandler):
     """Callable which sets response.body."""
@@ -116,7 +118,29 @@ class TestAuction:
     def nairareload(self,amount):
         '''Takes amount to add via POST. Also accepts negative numbers.'''
         email = authorized()
-        sample.nairaReload(email,amount)
+        if email != CBN_ACCOUNT and Decimal(amount) >= 0:
+        	sample.nairaReload(email,amount)
+        raise cherrypy.HTTPRedirect("/account")
+    
+    @cherrypy.expose
+    def nairaremove(self,amount):
+        email = authorized()
+        if email == CBN_ACCOUNT and Decimal(amount)>= 0:
+        	sample.nairaReload(email,-amount)
+        raise cherrypy.HTTPRedirect("/account")
+    
+    @cherrypy.expose
+    def dollarreload(self,amount):
+        email=authorized()
+        if email == CBN_ACCOUNT and Decimal(amount) >= 0:
+            sample.dollarReload(email, amount)
+        raise cherrypy.HTTPRedirect("/account")
+    
+    @cherrypy.expose
+    def dollarremove(self,amount):
+        email=authorized()
+        if email != CBN_ACCOUNT and Decimal(amount) >=0:
+            sample.dollarReload(email,-amount)
         raise cherrypy.HTTPRedirect("/account")
     
     @cherrypy.tools.mako(filename="testcreate.html")
@@ -124,14 +148,14 @@ class TestAuction:
     @cherrypy.expose
     def createauction(self):
         email = authorized()
-        return {'email': email}
+        return {'user': sample.userDetails(email)}
 
     @cherrypy.expose
     def create(self,amount,closedate):
         if not cherrypy.session.get('email'):
             raise cherrypy.HTTPRedirect("/signin")
         sample.createAuction(amount,closedate)
-        raise cherrypy.HTTPRedirect("/")
+        raise cherrypy.HTTPRedirect("/createauction")
         
     @cherrypy.tools.mako(filename="testsignup.html")
     @cherrypy.expose

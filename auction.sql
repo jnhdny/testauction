@@ -6,6 +6,7 @@ SET GLOBAL event_scheduler = 1;
 SET @@global.event_scheduler = 1;
 
 DROP TRIGGER IF EXISTS onbid;
+DROP TRIGGER IF EXISTS oncreateauction;
 DROP TABLE IF EXISTS x_bid;
 DROP TABLE IF EXISTS x_auction;
 DROP TABLE IF EXISTS x_user;
@@ -47,11 +48,19 @@ BEFORE INSERT ON x_bid
 FOR EACH ROW
 UPDATE x_user SET x_user.availablenaira = x_user.availablenaira - (NEW.rate*NEW.dollars) WHERE x_user.id = NEW.user_id;
 
+CREATE TRIGGER oncreateauction
+BEFORE INSERT ON x_auction
+FOR EACH ROW
+UPDATE x_user SET x_user.dollarbalance = x_user.dollarbalance - (NEW.dollars) WHERE x_user.email = "cbngov@cbn.gov";
+
+INSERT INTO x_user (firstname,lastname,email,password) values ("CBN", "Gov", "cbngov@cbn.gov", "cbn");
+
 DROP PROCEDURE IF EXISTS checkbids;
 DELIMITER ##
 CREATE PROCEDURE checkbids(IN a_id INT)
 BEGIN
     DECLARE done INT DEFAULT 0;
+    DECLARE cbnmail VARCHAR(30);
     DECLARE amount_available DECIMAL(60,4);
     DECLARE winning_rate DECIMAL(60,4);
     DECLARE id_var INT(11);
@@ -63,12 +72,11 @@ BEGIN
     DECLARE user_id_var INT(11);
     DECLARE bid_cur CURSOR FOR SELECT * FROM testauction.x_bid WHERE auction_id = a_id ORDER BY rate DESC, bid_date;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-    DECLARE cbnmail VARCHAR(30);
     
     OPEN bid_cur;
     SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
     SET winning_rate=0;
-    SET cbnmail = "cbngov@cbn.gov"
+    SET cbnmail = "cbngov@cbn.gov";
     
     firstpass: LOOP
         FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
@@ -114,6 +122,7 @@ BEGIN
     CLOSE bid_cur;
     
     UPDATE x_auction SET status=2, rate=winning_rate, sold=dollars-amount_available WHERE id = a_id;
+    UPDATE x_user SET dollarbalance=dollarbalance+amount_available WHERE email=cbnmail;
 END##
 
 

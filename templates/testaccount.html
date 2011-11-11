@@ -30,16 +30,30 @@
     	</div>
     	<div class="row">
 			<div class="span6">
+			%if user["email"] == "cbngov@cbn.gov":
 				<table>
 				<tr>
 					<td><strong>Naira:</strong></td>
 					<td>${user["nairabalance"]}<td>
-					<td><a href="/refill">Refill</a></td>
+					<td><a href="/refill">Remove</a></td>
 				</tr>
 				<tr>
 					<td><strong>Dollars</strong></td>
 					<td>${user["dollarbalance"]}<td>
-					<td><a href="./#">Withdraw</a></td>
+					<td><a href="./#">Reload</a></td>
+				</tr>
+				</table>
+			%else:
+				<table>
+				<tr>
+					<td><strong>Naira:</strong></td>
+					<td>${user["nairabalance"]}<td>
+					<td><a href="/refill">Reload</a></td>
+				</tr>
+				<tr>
+					<td><strong>Dollars</strong></td>
+					<td>${user["dollarbalance"]}<td>
+					<td><a href="./#">Remove</a></td>
 				</tr>
 				<tr>
 					<td><strong>Available naira:</strong></td>
@@ -47,6 +61,7 @@
 					<td></td>
 					</tr>
 				</table>
+			%endif
 			</div>
 		</div>
 		<div class="row">
