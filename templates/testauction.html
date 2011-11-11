@@ -54,7 +54,7 @@
 								<input type="submit" value="Bid" class="btn primary">
 								
 								</form>
-						%   elif auction["status"] == 0 and email != "cbngov@cbn.gov":
+						%   elif auction["status"] == 0 and email == "cbngov@cbn.gov":
 								<p> You be oga o! You cannot bid!!</p>
 						%	elif auction["status"] == 1:
 								<p> Winning bids are being computed. Please wait. </p>
