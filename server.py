@@ -1,6 +1,7 @@
 import cherrypy,os.path
 import sample
 from mako.lookup import TemplateLookup
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class MakoHandler(cherrypy.dispatch.LateParamPageHandler):
     """Callable which sets response.body."""
@@ -51,7 +52,7 @@ def authorized():
 
 class TestAuction:
     @cherrypy.expose
-    @cherrypy.tools.mako(filename="index.html")
+    @cherrypy.tools.mako(filename="testindex.html")
     def index(self):
         email = authorized()
         openauctions = sample.runQuery('''select id, dollars, close_date from x_auction where status=0''',())
@@ -75,12 +76,13 @@ class TestAuction:
 
 #Login page    
     @cherrypy.expose
-    @cherrypy.tools.mako(filename="login.html")
+    #@cherrypy.tools.mako(filename="login.html")
+    @cherrypy.tools.mako(filename="test.html")
     def signin(self):
         return {}
 
     @cherrypy.expose
-    @cherrypy.tools.mako(filename="auction.html")
+    @cherrypy.tools.mako(filename="testauction.html")
     def auction (self,id):
         '''Auction page shows details of auction and allows bid if auction is open'''
         email = authorized()
@@ -97,7 +99,7 @@ class TestAuction:
         else:
             return '''<html>Bid unsuccessful<br><a href="/auction/%s">Return to Auction</a></html>'''%id
     
-    @cherrypy.tools.mako(filename="account.html")
+    @cherrypy.tools.mako(filename="testaccount.html")
     @cherrypy.expose
     def account(self):
         email=authorized()
@@ -116,7 +118,8 @@ class TestAuction:
         sample.nairaReload(email,amount)
         raise cherrypy.HTTPRedirect("/account")
     
-    @cherrypy.tools.mako(filename="createauction.html")
+    @cherrypy.tools.mako(filename="testcreate.html")
+    #@cherrypy.tools.mako(filename="createauction.html")
     @cherrypy.expose
     def createauction(self):
         email = authorized()
@@ -150,5 +153,13 @@ def defaulterror(status, message, traceback, version):
     return "An Error has occurred"
 cherrypy.config.update({'error_page.default': defaulterror})
 
-cherrypy.quickstart(TestAuction())
+tconf = {'/':
+	{'tools.staticdir.root':current_dir
+	},
+	'/static':{'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'}
+}
+cherrypy.tree.mount(TestAuction(), "/", tconf)
+cherrypy.engine.start()
+cherrypy.engine.block()
+#cherrypy.quickstart(TestAuction())
 
