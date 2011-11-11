@@ -105,7 +105,8 @@ class TestAuction:
         email=authorized()
         aa = sample.userDetails(email)
         return {'user':aa}
-
+	
+    @cherrypy.tools.mako(filename="nairareload.html")
     @cherrypy.expose
     def refill(self):
         email = authorized()
