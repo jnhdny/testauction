@@ -1,9 +1,15 @@
 <html>
+<head>
+<script language="javascript" src="static/js/protoplasm.js"></script>
+<script language="javascript">
+Protoplasm.use('datepicker') .transform('input.datetimepicker', { 'timePicker': true, 'locale': 'en_iso8601' }); 
+</script>
+</head>
 <body>
 <h2>Create Auction</h2>
 <form method="POST" action="/create">
   <p>Dollars on sale: <input type="text" name="amount"></p>
-  <p>Auction ends at: <input type="datetime" name="closedate"></p>
+  <p>Auction ends at: <input type="text" class=datetimepicker name="closedate"></p>
   <input type="submit" value="Create">
 </form>
 <p>Logged in as <a href="/account">${email}</a> <a href="/logout">Logout</a></p>

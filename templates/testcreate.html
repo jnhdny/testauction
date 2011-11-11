@@ -1,0 +1,55 @@
+<html>
+<head>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li class="active"><a href="/createauction">New Auction</a></li>
+            <li><a href="/#">Past Auctions</a></li>
+            <li><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${email}</p>
+        </div>
+      </div>
+    </div>   
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Create New Auction</h2>
+    	</div>
+    	<div class="row">
+    	<div class="span12">
+    		<form method="POST" action="/create">
+			<div class="clearfix">    
+            	<label for="xlInput">Dollars for auction:</label>
+            	<div class="input">
+              		<input class="xlarge" id="xlInput" name="amount" size="30" type="text">
+            	</div>
+          	</div>
+          	<div class="clearfix">    
+            	<label for="xlInput">Auction ends at: </label>
+            	<div class="input">
+              		<input class="xlarge" id="xlInput" name="closedate" size="30" type="text">
+              		<span class="help-block">
+                	Enter date in this format: 2011-11-30 13:50:00
+              		</span>
+            	</div>
+          	</div>
+          	<div class="input">
+            <input type="submit" class="btn primary" value="Create">
+          	</div>
+    		</form>    		
+    	</div>
+    	</div>
+    </div>
+<body>
+</html>

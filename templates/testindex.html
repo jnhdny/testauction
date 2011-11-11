@@ -1,0 +1,49 @@
+<html>
+<head>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/createauction">New Auction</a></li>
+            <li><a href="/#">Past Auctions</a></li>
+            <li><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${email}</p>
+        </div>
+      </div>
+    </div>   
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Open Auctions</h2>
+    	</div>
+		<div class="row">
+			<div class="span6">
+    			<table>
+					<tr>
+						<td><strong>Amount</strong><td>
+						<td><strong>Closing Time</strong></td>
+						<td><strong></strong></td>
+					</tr>
+					%	for a in openauctions:
+							<tr>
+							<td>${a[1]}<td>
+							<td>${a[2]}</td>
+							<td><a href="auction/${a[0]}">Bid</a></td>
+							</tr>
+					%	endfor
+				</table>
+			</div>
+		</div>
+    </div>
+<body>
+</html>

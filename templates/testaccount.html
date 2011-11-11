@@ -1,0 +1,57 @@
+<html>
+<head>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/createauction">New Auction</a></li>
+            <li><a href="/past">Past Auctions</a></li>
+            <li class="active"><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${user["email"]}</p>
+        </div>
+      </div>
+    </div>   
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Your Account</h2>
+    	</div>
+    	<div class="row">
+			<div class="span6">
+				<table>
+				<tr>
+					<td><strong>Naira:</strong></td>
+					<td>${user["nairabalance"]}<td>
+					<td><a href="/refill">Refill</a></td>
+				</tr>
+				<tr>
+					<td><strong>Dollars</strong></td>
+					<td>${user["dollarbalance"]}<td>
+					<td><a href="./#">Withdraw</a></td>
+				</tr>
+				<tr>
+					<td><strong>Available naira:</strong></td>
+					<td>${user["availablenaira"]}<td>
+					<td></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span6">
+			<a href="/logout">Logout</a>
+			</div>
+		</div>
+    </div>
+<body>
+</html>

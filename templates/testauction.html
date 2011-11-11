@@ -1,0 +1,67 @@
+<html>
+<head>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/createauction">New Auction</a></li>
+            <li><a href="/#">Past Auctions</a></li>
+            <li><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${email}</p>
+        </div>
+      </div>
+    </div>   
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Bid</h2>
+    	</div>
+		<div class="row">
+			<div class="span6">
+				%	if not exists:
+						<p> Auction does not exist </p>
+				%	else:
+						<table>
+						<tr>
+						<td><strong>Amount:</strong></td> <td>${auction["dollars"]}</td>
+						</tr>
+						<tr>
+						<td><strong>Close date:</strong></td> <td>${auction["close_date"]}</td>
+						</tr>
+						</table>
+						% 	if auction["status"] == 0:
+								<form method="POST" action="/bid" class="form-stacked">
+								<input type="hidden" name="id" value=${auction["id"]}>
+								<div class="clearfix">
+									<label for="xlInput">Amount:</label>
+									<div class="input"><input name="amount" type="text"></div>
+								</div>
+								<div class="clearfix">
+									<label for="xlInput">Rate:</label>
+									<div class="input"><input name="rate" type="text"></div>
+								</div>
+								
+								<input type="submit" value="Bid" class="btn primary">
+								
+								</form>
+						%	elif auction["status"] == 1:
+								<p> Winning bids are being computed. Please wait. </p>
+						%	else:
+								<p>$${auction["sold"]} was sold at N${auction["rate"]} to the dollar. </p>
+						%	endif	
+				%	endif
+			</div>
+		</div>
+    </div>
+<body>
+</html>
