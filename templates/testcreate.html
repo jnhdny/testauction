@@ -27,6 +27,7 @@
     	<div class="page-header">
     	<h2>Create New Auction</h2>
     	</div>
+    	% if email=="cbngov@cbn.gov":
     	<div class="row">
     	<div class="span12">
     		<form method="POST" action="/create">
@@ -51,6 +52,11 @@
     		</form>    		
     	</div>
     	</div>
+    	% else:
+    	<div class="row">
+    	You cannot create an auction
+    	</div>
+    	% endif
     </div>
 <body>
 </html>

@@ -51,66 +51,69 @@ DROP PROCEDURE IF EXISTS checkbids;
 DELIMITER ##
 CREATE PROCEDURE checkbids(IN a_id INT)
 BEGIN
-	DECLARE done INT DEFAULT 0;
-	DECLARE amount_available DECIMAL(60,4);
-	DECLARE winning_rate DECIMAL(60,4);
-	DECLARE id_var INT(11);
-	DECLARE rate_var DECIMAL(60,4);
-	DECLARE dollars_var DECIMAL(60,4); 
-	DECLARE bid_date_var TIMESTAMP;
-	DECLARE status_var TINYINT(4);
-	DECLARE auction_id_var INT(11);
-	DECLARE user_id_var INT(11);
-	DECLARE bid_cur CURSOR FOR SELECT * FROM testauction.x_bid WHERE auction_id = a_id ORDER BY rate DESC, bid_date;
-	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-	
-	OPEN bid_cur;
-	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
-	SET winning_rate=0;
-	
-	firstpass: LOOP
-		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
-		IF done THEN LEAVE firstpass;
-		END IF;
-		IF dollars_var > amount_available THEN LEAVE firstpass;
-		ELSE
-			SET winning_rate = rate_var;
-			SET amount_available = amount_available - dollars_var;
-		END IF;
-		IF done THEN LEAVE firstpass;
-		END IF;
-	END LOOP firstpass;
-	CLOSE bid_cur;
+    DECLARE done INT DEFAULT 0;
+    DECLARE amount_available DECIMAL(60,4);
+    DECLARE winning_rate DECIMAL(60,4);
+    DECLARE id_var INT(11);
+    DECLARE rate_var DECIMAL(60,4);
+    DECLARE dollars_var DECIMAL(60,4); 
+    DECLARE bid_date_var TIMESTAMP;
+    DECLARE status_var TINYINT(4);
+    DECLARE auction_id_var INT(11);
+    DECLARE user_id_var INT(11);
+    DECLARE bid_cur CURSOR FOR SELECT * FROM testauction.x_bid WHERE auction_id = a_id ORDER BY rate DESC, bid_date;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    DECLARE cbnmail VARCHAR(30);
+    
+    OPEN bid_cur;
+    SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id);
+    SET winning_rate=0;
+    SET cbnmail = "cbngov@cbn.gov"
+    
+    firstpass: LOOP
+        FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
+        IF done THEN LEAVE firstpass;
+        END IF;
+        IF dollars_var > amount_available THEN LEAVE firstpass;
+        ELSE
+            SET winning_rate = rate_var;
+            SET amount_available = amount_available - dollars_var;
+        END IF;
+        IF done THEN LEAVE firstpass;
+        END IF;
+    END LOOP firstpass;
+    CLOSE bid_cur;
 
-	SET done = 0;
-	OPEN bid_cur;
-	SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id); 
-	secondpass: LOOP
-		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
-		IF done THEN LEAVE secondpass;
-		END iF;
-		IF rate_var >= winning_rate THEN
-			SET amount_available = amount_available - dollars_var;
-			IF amount_available >= 0 THEN
-				UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) - (dollars_var*winning_rate), nairabalance = nairabalance - (dollars_var*winning_rate), dollarbalance=dollarbalance+dollars_var where id = user_id_var;
-				UPDATE x_bid SET status = 1 where id=id_var;
-				ITERATE secondpass;
-			ELSE
-				UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
-				UPDATE x_bid SET status = 2 where id=id_var;
-				ITERATE secondpass;
-			END IF;
-		ELSE
-		    UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
-			UPDATE x_bid SET status = 2 where id=id_var;
-			ITERATE secondpass;
-		END IF;			
-		IF done THEN LEAVE secondpass;
-		END iF;
-	END LOOP secondpass;
-	CLOSE bid_cur;
-	
-	UPDATE x_auction SET status=2, rate=winning_rate, sold=dollars-amount_available WHERE id = a_id;
+    SET done = 0;
+    OPEN bid_cur;
+    SET amount_available = (SELECT dollars FROM testauction.x_auction where id = a_id); 
+    secondpass: LOOP
+        FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
+        IF done THEN LEAVE secondpass;
+        END iF;
+        IF rate_var >= winning_rate THEN
+            SET amount_available = amount_available - dollars_var;
+            IF amount_available >= 0 THEN
+                UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) - (dollars_var*winning_rate), nairabalance = nairabalance - (dollars_var*winning_rate), dollarbalance=dollarbalance+dollars_var where id = user_id_var;
+                UPDATE x_user SET nairabalance = nairabalance + (dollars_var*winning_rate) where email=cbnmail;
+                UPDATE x_bid SET status = 1 where id=id_var;
+                ITERATE secondpass;
+            ELSE
+                UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
+                UPDATE x_bid SET status = 2 where id=id_var;
+                ITERATE secondpass;
+            END IF;
+        ELSE
+            UPDATE x_user SET availablenaira = availablenaira + (dollars_var*rate_var) where id = user_id_var;
+            UPDATE x_bid SET status = 2 where id=id_var;
+            ITERATE secondpass;
+        END IF;            
+        IF done THEN LEAVE secondpass;
+        END iF;
+    END LOOP secondpass;
+    CLOSE bid_cur;
+    
+    UPDATE x_auction SET status=2, rate=winning_rate, sold=dollars-amount_available WHERE id = a_id;
 END##
 
 

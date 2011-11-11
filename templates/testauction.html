@@ -39,7 +39,7 @@
 						<td><strong>Close date:</strong></td> <td>${auction["close_date"]}</td>
 						</tr>
 						</table>
-						% 	if auction["status"] == 0:
+						% 	if auction["status"] == 0 and email != "cbngov@cbn.gov":
 								<form method="POST" action="/bid" class="form-stacked">
 								<input type="hidden" name="id" value=${auction["id"]}>
 								<div class="clearfix">
@@ -54,6 +54,8 @@
 								<input type="submit" value="Bid" class="btn primary">
 								
 								</form>
+						%   elif auction["status"] == 0 and email != "cbngov@cbn.gov":
+								<p> You be oga o! You cannot bid!!</p>
 						%	elif auction["status"] == 1:
 								<p> Winning bids are being computed. Please wait. </p>
 						%	else:
