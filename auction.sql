@@ -70,6 +70,8 @@ BEGIN
 	
 	firstpass: LOOP
 		FETCH bid_cur INTO id_var,rate_var,dollars_var,bid_date_var,status_var,auction_id_var,user_id_var;
+		IF done THEN LEAVE firstpass;
+		END IF;
 		IF dollars_var > amount_available THEN LEAVE firstpass;
 		ELSE
 			SET winning_rate = rate_var;

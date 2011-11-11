@@ -133,7 +133,7 @@ class TestAuction:
         sample.createAuction(amount,closedate)
         raise cherrypy.HTTPRedirect("/")
         
-    @cherrypy.tools.mako(filename="signup.html")
+    @cherrypy.tools.mako(filename="testsignup.html")
     @cherrypy.expose
     def signup(self):
         return {}
@@ -154,7 +154,7 @@ class TestAuction:
     @cherrypy.expose
     def past(self):
         email=authorized()
-        oldauctions = sample.runQuery('''select close_date, dollars, sold from x_auction where status=2;''', ())
+        oldauctions = sample.oldAuctions()
         return {'email':email, 'oldauctions':oldauctions}
 
 

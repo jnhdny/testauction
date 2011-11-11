@@ -73,6 +73,13 @@ def createUser(firstname,lastname,email,password):
         return 0
     return 1
 
+def oldAuctions():
+    results = runQuery('''select close_date, dollars, sold, rate, status, id from x_auction where status=2;''', ())
+    rr = []
+    for i in results:
+        rr.append(dict(zip(["close_date", "dollars", "sold", "rate", "status", "id"], i)))
+    return rr
+
 
 
     

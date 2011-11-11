@@ -1,12 +1,12 @@
 <html>
 <head>
-<link href="../static/css/bootstrap.css" rel="stylesheet">
+<link href="/static/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
       }
     </style>
-    <title>Sign In</title>
+    <title>Sign Up</title>
 </head>
 <body>
     <div class="topbar">
@@ -14,45 +14,50 @@
         <div class="container-fluid">
           <a class="brand" href="#">Dollar Auction</a>
           <ul class="nav">
-            <li class="active"><a href="#">Home</a></li>
+            <li><a href="/">Home</a></li>
             <li><a href="/createauction">New Auction</a></li>
             <li><a href="/past">Past Auctions</a></li>
             <li><a href="/account">Account</a></li>
           </ul>
-          <p class="pull-right">You are not logged in</p>
+          <p class="pull-right">Not logged In</p>
         </div>
       </div>
-    </div>
-    
+    </div>   
     <div class="container">
     	<div class="page-header">
-    	<h2>Sign In</h2>
+    	<h2>Sign Up</h2>
     	</div>
-    	<div class="row">
-    	<div class="span12">
-    		<form method="POST" action="/login">
+		<div class="row">
+			<div class="span12">
+    		<form method="POST" action="/register">
 			<div class="clearfix">    
-            	<label for="xlInput">Email:</label>
+            	<label for="xlInput">First Name:</label>
+            	<div class="input">
+              		<input class="xlarge" id="xlInput" name="firstname" size="30" type="text">
+            	</div>
+            	<label for="xlInput">Last Name:</label>
+            	<div class="input">
+              		<input class="xlarge" id="xlInput" name="lastname" size="30" type="text">
+            	</div>
+            	<label for="xlInput">Email address</label>
             	<div class="input">
               		<input class="xlarge" id="xlInput" name="email" size="30" type="text">
             	</div>
-          	</div>
-          	<div class="clearfix">    
             	<label for="xlInput">Password:</label>
             	<div class="input">
               		<input class="xlarge" id="xlInput" name="password" size="30" type="password">
             	</div>
+            	<label for="xlInput">Password:</label>
+            	<div class="input">
+              		<input class="xlarge" id="xlInput" name="c_password" size="30" type="password">
+            	</div>
           	</div>
           	<div class="input">
-            <input type="submit" class="btn primary" value="Login">
+            <input type="submit" class="btn primary" value="Sign Up">
           	</div>
-          	<div class="input">
-          	No account? <a href="/signup">Sign up</a>
-          	</div>
-    		</form>
+    		</form>    		
     	</div>
-    	</div>
+		</div>
     </div>
-
 <body>
 </html>
