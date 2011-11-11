@@ -13,9 +13,9 @@
         <div class="container-fluid">
           <a class="brand" href="#">Dollar Auction</a>
           <ul class="nav">
-            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/">Home</a></li>
             <li><a href="/createauction">New Auction</a></li>
-            <li><a href="/past">Past Auctions</a></li>
+            <li class="active"><a href="/past">Past Auctions</a></li>
             <li><a href="/account">Account</a></li>
           </ul>
           <p class="pull-right">${email}</p>
@@ -24,21 +24,23 @@
     </div>   
     <div class="container">
     	<div class="page-header">
-    	<h2>Open Auctions</h2>
+    	<h2>Past Auctions</h2>
     	</div>
 		<div class="row">
-			<div class="span6">
+			<div class="span12">
     			<table>
+    				<thead>
 					<tr>
-						<td><strong>Amount</strong><td>
 						<td><strong>Closing Time</strong></td>
-						<td><strong></strong></td>
+						<td><strong>Amount Offered</strong></td>
+						<td><strong>Amount Sold</strong></td>
 					</tr>
-					%	for a in openauctions:
+					</thead>
+					%	for a in oldauctions:
 							<tr>
-							<td>${a[1]}<td>
+							<td>${a[0]}</td>
+							<td>${a[1]}</td>
 							<td>${a[2]}</td>
-							<td><a href="auction/${a[0]}">Bid</a></td>
 							</tr>
 					%	endfor
 				</table>

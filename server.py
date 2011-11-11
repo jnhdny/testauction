@@ -149,6 +149,15 @@ class TestAuction:
     	        return '''Account with this email exists'''
     	else:
     	    return "User account creation failed"
+    
+    @cherrypy.tools.mako(filename="testpast.html")
+    @cherrypy.expose
+    def past(self):
+        email=authorized()
+        oldauctions = sample.runQuery('''select close_date, dollars, sold from x_auction where status=2;''', ())
+        return {'email':email, 'oldauctions':oldauctions}
+
+
 
 def defaulterror(status, message, traceback, version):
     return "An Error has occurred"
