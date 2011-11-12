@@ -1,13 +1,29 @@
 <html>
 <head>
 <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <%include file="header.html"/>
     <style type="text/css">
       body {
         padding-top: 60px;
       }
     </style>
     <title>Account</title>
-    <script language="javascript" src="static/js/bootstrap-modal.js"></script>
+    <script>
+            jQuery(document).ready(function(){
+                // binds form submission and fields to the validation engine
+                jQuery("#nairareload").validationEngine();
+                jQuery("#dollarremove").validationEngine();
+                jQuery("#dollarreload").validationEngine();
+                jQuery("#nairaremove").validationEngine();
+            });
+            function checkHELLO(field, rules, i, options){
+                if (field.val() != "HELLO") {
+                    // this allows to use i18 for the error msgs
+                    return options.allrules.validate2fields.alertText;
+                }
+            }
+</script>
+
 </head>
 <body>
     <div class="topbar">
@@ -35,12 +51,12 @@
 				<tr>
 					<td><strong>Naira:</strong></td>
 					<td>${user["nairabalance"]}<td>
-					<td><a href="/refill">Remove</a></td>
+					<td><button data-controls-modal="modal-nairaremove" data-backdrop="true" data-keyboard="true" class="btn small primary">Remove</button></td>
 				</tr>
 				<tr>
 					<td><strong>Dollars</strong></td>
 					<td>${user["dollarbalance"]}<td>
-					<td><a href="./#">Reload</a></td>
+					<td><button data-controls-modal="modal-dollarreload" data-backdrop="true" data-keyboard="true" class="btn small primary">Reload</button></td>
 				</tr>
 				</table>
 			%else:
@@ -48,12 +64,12 @@
 				<tr>
 					<td><strong>Naira:</strong></td>
 					<td>${user["nairabalance"]}<td>
-					<td><a href="/refill">Reload</a></td>
+					<td><button data-controls-modal="modal-nairareload" data-backdrop="true" data-keyboard="true" class="btn small primary">Reload</button></td>
 				</tr>
 				<tr>
 					<td><strong>Dollars</strong></td>
 					<td>${user["dollarbalance"]}<td>
-					<td><a href="./#">Remove</a></td>
+					<td><button data-controls-modal="modal-dollarremove" data-backdrop="true" data-keyboard="true" class="btn small primary">Remove</button></td>
 				</tr>
 				<tr>
 					<td><strong>Available naira:</strong></td>
@@ -70,5 +86,88 @@
 			</div>
 		</div>
     </div>
+    %if user["email"] != "cbngov@cbn.gov":
+        <div id="modal-nairareload" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Reload Naira</h3>
+            </div>
+            <div class="modal-body">
+            <form id="nairareload" method="POST" action="/nairareload">
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Reload" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+		<div id="modal-dollarremove" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Withdraw Dollars</h3>
+            </div>
+            <div class="modal-body">
+            <form id="dollarremove" method="POST" action="/dollarremove">
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Reload" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+    %else:
+        <div id="modal-dollarreload" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Reload Dollars</h3>
+            </div>
+            <div class="modal-body">
+            <form id="dollarreload" method="POST" action="/dollarreload">
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Reload" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+        <div id="modal-nairaremove" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Withdraw Naira</h3>
+            </div>
+            <div class="modal-body">
+            <form id="nairaremove" method="POST" action="/nairaremove">
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Remove" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+    %endif
 <body>
 </html>

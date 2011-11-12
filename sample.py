@@ -73,6 +73,12 @@ def nairaReload(email,amount):
 def dollarReload(email,amount):
     runQuery('''update x_user set dollarbalance=dollarbalance+%s where email=%s''', (amount,email))
 
+def nairaRemove(email,amount):
+    runQuery('''update x_user set availablenaira=availablenaira-%s, nairabalance=nairabalance-%s where email=%s''', (amount,amount,email))
+
+def dollarRemove(email,amount):
+    runQuery('''update x_user set dollarbalance=dollarbalance-%s where email=%s''', (amount,email))
+
 def createUser(firstname,lastname,email,password):
     '''return 0 if user creation fails because of Duplicate entry'''
     try:

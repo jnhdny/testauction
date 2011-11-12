@@ -85,7 +85,7 @@
                     "alertText": "* Invalid floating decimal number"
                 },
                 "unsignednumber": {
-                    // Number, including positive, negative, and floating decimal. credit: orefalo
+                    // Number, only positive, and floating decimal. credit: orefalo
                     "regex": /^(([0-9]+)([\.,]([0-9]+))?|([\.,]([0-9]+))?)$/,
                     "alertText": "* Invalid number"
                 },

@@ -126,7 +126,7 @@ class TestAuction:
     def nairaremove(self,amount):
         email = authorized()
         if email == CBN_ACCOUNT and Decimal(amount)>= 0:
-        	sample.nairaReload(email,-amount)
+        	sample.nairaRemove(email,amount)
         raise cherrypy.HTTPRedirect("/account")
     
     @cherrypy.expose
@@ -140,7 +140,7 @@ class TestAuction:
     def dollarremove(self,amount):
         email=authorized()
         if email != CBN_ACCOUNT and Decimal(amount) >=0:
-            sample.dollarReload(email,-amount)
+            sample.dollarRemove(email,amount)
         raise cherrypy.HTTPRedirect("/account")
     
     @cherrypy.tools.mako(filename="testcreate.html")
