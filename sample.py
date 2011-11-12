@@ -14,13 +14,11 @@ def runQuery(query, parameters):
 	c.close()
 	return results
 
-#Consolidate user detail queries
 def userDetails(email):
 	results = runQuery("select id, availablenaira,nairabalance,dollarbalance,email from x_user where email =%s;", (email,))
 	# Courtesy http://stackoverflow.com/questions/209840/map-two-lists-into-a-dictionary-in-python
 	return dict(zip(["id", "availablenaira", "nairabalance", "dollarbalance", "email"],results[0]))
 
-#Consolidate auction detail query
 def auctionDetails(id):
     results = runQuery("select id, dollars, status, rate, creation_date, close_date, sold from x_auction where id =%s;", (id,))
     try:
@@ -29,9 +27,11 @@ def auctionDetails(id):
         return 0
 
 def bidDetails(auction_id, email):
-    results = runQuery('''select dollars, rate, bid_date, status from x_bid,x_user where x_bid = %s and x_user.email=%s''' % (auction_id,email))
+    results = runQuery('''select dollars, rate, bid_date, status from x_bid,x_user where auction_id = %s and x_user.email=%s''', (auction_id,email))
+    return results
 	
 def createAuction(amount,close_date):
+    #Check if there is enough money in CBN account and then create an auction
     dav = runQuery('''select dollarbalance from x_user where email=%s''',(CBN_ACCOUNT))[0][0]
     if Decimal(amount) <= dav:
         c = tt.cursor()

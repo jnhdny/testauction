@@ -1,5 +1,31 @@
 <html>
 <head>
+<%
+import sample
+u = sample.userDetails(email)
+%>
+<%include file="header.html"/>
+<script>
+            jQuery(document).ready(function(){
+                // binds form submission and fields to the validation engine
+                jQuery("#formbid").validationEngine();
+            });
+            
+            /**
+             *
+             * @param {jqObject} the field where the validation applies
+             * @param {Array[String]} validation rules for this field
+             * @param {int} rule index
+             * @param {Map} form options
+             * @return an error string if validation failed
+             */
+            function checkHELLO(field, rules, i, options){
+                if (field.val() != "HELLO") {
+                    // this allows to use i18 for the error msgs
+                    return options.allrules.validate2fields.alertText;
+                }
+            }
+</script>
 <link href="/static/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
@@ -27,7 +53,7 @@
     	<h2>Auction Details</h2>
     	</div>
 		<div class="row">
-			<div class="span6">
+			<div class="span8">
 				%	if not exists:
 						<p> Auction does not exist </p>
 				%	else:
@@ -40,28 +66,70 @@
 						</tr>
 						</table>
 						% 	if auction["status"] == 0 and email != "cbngov@cbn.gov":
-								<form method="POST" action="/bid" class="form-stacked">
-								<input type="hidden" name="id" value=${auction["id"]}>
-								<div class="clearfix">
-									<label for="xlInput">Amount:</label>
-									<div class="input"><input name="amount" type="text"></div>
-								</div>
-								<div class="clearfix">
-									<label for="xlInput">Rate:</label>
-									<div class="input"><input name="rate" type="text"></div>
-								</div>
-								
-								<input type="submit" value="Bid" class="btn primary">
-								
-								</form>
+								<p>You have N${u["availablenaira"]} available</p>
+            	<form id="formbid" method="POST" action="/bid" class="form-stacked">
+					<input type="hidden" name="id" value=${auction["id"]}>
+					<div class="clearfix">
+						<label for="xlInput">Amount:</label>
+						<div class="input"><input id ="am" class = "validate[required,custom[number]]" name="amount" type="text"></div>
+					</div>
+					<div class="clearfix">
+						<label for="xlInput">Rate:</label>
+						<div class="input"><input id="ra" class = "validate[required,custom[number]]" name="rate" type="text"></div>
+					</div>
+					
+					<input type="submit" value="Bid" class="btn primary">
+					
+				</form>
 						%   elif auction["status"] == 0 and email == "cbngov@cbn.gov":
 								<p> You be oga o! You cannot bid!!</p>
 						%	elif auction["status"] == 1:
 								<p> Winning bids are being computed. Please wait. </p>
 						%	else:
 								<p>$${auction["sold"]} was sold at N${auction["rate"]} to the dollar. </p>
-						%	endif	
-				%	endif
+						%	endif
+						
+						%	if email != "cbngov@cbn.gov":
+								<%
+								current_bids = sample.bidDetails(auction["id"], u["email"])
+								%>
+						
+							%	if current_bids:
+								<p>
+								<h3>Your Bids</h3>
+								<table>
+								<thead>
+								<tr>
+								<td><strong>Amount</strong></td>
+								<td><strong>Rate</strong></td>
+								<td><strong>Bid Date</strong></td>
+								<td><strong>Status</strong></td>
+								</tr>
+								</thead>
+								%	for a in current_bids:
+									<tr>
+									<td>${a[0]}</td>
+									<td>${a[1]}</td>
+									<td>${a[2]}</td>
+									<td>
+									%	if a[3] == 0:
+											OPEN
+									%	elif a[3] == 1:
+											SUCCESS
+									%	elif a[3] == 2:
+											FAILED
+									%	endif
+									</td>
+									</tr>
+								%	endfor
+								</table>
+								</p>
+							%	else:
+									<p>You have no bids on this auction.</p>
+								%	endif
+							
+							%	endif
+						%	endif
 			</div>
 		</div>
     </div>
