@@ -43,7 +43,7 @@ class MakoLoader(object):
 main = MakoLoader()
 cherrypy.tools.mako = cherrypy.Tool('on_start_resource', main)
 
-cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :500, 'tools.mako.directories':"templates"})
+cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :500, 'tools.mako.directories':"templates",'server.socket_host': '0.0.0.0','server.socket_port': 8080,})
 
 def authorized():
     ''' Redirects to login page if not logged on, else returns logged on user email'''
