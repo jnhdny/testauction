@@ -59,10 +59,16 @@ u = sample.userDetails(email)
 				%	else:
 						<table>
 						<tr>
-						<td><strong>Amount:</strong></td> <td>${auction["dollars"]}</td>
+						<td><strong>Amount:</strong></td> <td>$${auction["dollars"]}</td>
 						</tr>
 						<tr>
-						<td><strong>Closes in:</strong></td> <td>${sample.getTimeLeft(auction["close_date"])}</td>
+						<td><strong>
+						% if auction["status"] == 0:
+						Closes in:
+						% else:
+						Closed at:
+						%endif
+						</strong></td> <td>${sample.getTimeLeft(auction["close_date"])}</td>
 						</tr>
 						</table>
 						% 	if auction["status"] == 0 and email != "cbngov@cbn.gov":
@@ -100,8 +106,8 @@ u = sample.userDetails(email)
 								<table>
 								<thead>
 								<tr>
-								<td><strong>Amount</strong></td>
-								<td><strong>Rate</strong></td>
+								<td><strong>Amount ($)</strong></td>
+								<td><strong>Rate (N/$)</strong></td>
 								<td><strong>Bid Date</strong></td>
 								<td><strong>Status</strong></td>
 								</tr>

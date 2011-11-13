@@ -31,7 +31,7 @@ import sample
     	<h2>Open Auctions</h2>
     	</div>
 		<div class="row">
-			<div class="span6">
+			<div class="span8">
     			<table>
 					<tr>
 						<td><strong>Amount</strong><td>
@@ -40,7 +40,7 @@ import sample
 					</tr>
 					%	for a in openauctions:
 							<tr>
-							<td>${a[1]}<td>
+							<td>$${a[1]}<td>
 							<td>${sample.getTimeLeft(a[2])}</td>
 							<td><a href="auction/${a[0]}">Bid</a></td>
 							</tr>

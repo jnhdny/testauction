@@ -163,7 +163,9 @@ class TestAuction:
     @cherrypy.expose
     def signup(self):
         return {}
-    
+
+
+#Receives POST data!!!!    
     @cherrypy.expose
     def register(self,firstname,lastname,email,password,c_password):
     	if password == c_password:
@@ -184,6 +186,7 @@ class TestAuction:
         return {'email':email, 'oldauctions':oldauctions}
 
 
+#Receives POST data!!!!
     @cherrypy.expose
     def xvalidate(self,validcode):
         if cherrypy.session.get('email'):
@@ -202,7 +205,8 @@ class TestAuction:
             return "Invalid validation code"
         else:
             return '''Validation successful. Click <a href="/signin">here</a> to sign in.'''
-    
+
+#Has a Form!!!!!    
     @cherrypy.tools.mako(filename="validate.html")
     @cherrypy.expose    
     def validate(self):

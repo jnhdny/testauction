@@ -23,6 +23,7 @@ def runQuery(query, parameters):
 	c.close()
 	return results
 
+#Who can call this function?
 def userDetails(email):
 	results = runQuery("select id, availablenaira,nairabalance,dollarbalance,email from x_user where email =%s;", (email,))
 	# Courtesy http://stackoverflow.com/questions/209840/map-two-lists-into-a-dictionary-in-python
@@ -162,18 +163,25 @@ def getMinute(st):
 
 
 def getDate(st):
-    return (datetime.datetime.now()+datetime.timedelta(days=getDay(st),hours=getHour(st), minutes=getMinute(st))).strftime("%Y-%m-%d %H:%M:%S")
+    return ( datetime.datetime.now() + datetime.timedelta(days=getDay(st),hours=getHour(st), minutes=getMinute(st)) ).strftime("%Y-%m-%d %H:%M:%S")
 
 def getTimeLeft(tt):
-    diff = tt - datetime.datetime.now()
-    hours,minutes,seconds = (0,0,0)
-    if diff.seconds > 60:
-        minutes,seconds = divmod(diff.seconds,60)
-        if minutes > 60:
-            hours,minutes = divmod(minutes,60)
-    datestring = ""
-    if hours:
-        datestring = str(hours) + " hours "
-    if minutes:
-        datestring = datestring+ str(minutes)+ " minutes "
-    return datestring
+	if datetime.datetime.now() < tt:
+		diff = tt - datetime.datetime.now()
+		hours,minutes,seconds = (0,0,0)
+		if diff.seconds > 60:
+			minutes,seconds = divmod(diff.seconds,60)
+			if minutes > 60:
+				hours,minutes = divmod(minutes,60)
+		datestring = ""
+		if diff.days:
+			datestring = datestring + str(diff.days) + " days "
+		if hours:
+			datestring = datestring + str(hours) + " hours "
+		if minutes:
+			datestring = datestring+ str(minutes)+ " minutes "
+		if not (diff.days or hours or minutes):
+			datestring = str(diff.seconds) + " seconds"
+		return datestring
+	else:
+		return tt.strftime("%Y-%m-%d %H:%M:%S")
