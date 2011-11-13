@@ -36,7 +36,7 @@ def auctionDetails(id):
         return 0
 
 def bidDetails(auction_id, email):
-    results = runQuery('''select x_user.id,dollars, rate, bid_date, status from x_bid inner join x_user on x_user.id=x_bid.user_id where auction_id = %s and x_user.email=%s''', (auction_id,email))
+    results = runQuery('''select dollars, rate, bid_date, status from x_bid inner join x_user on x_user.id=x_bid.user_id where auction_id = %s and x_user.email=%s''', (auction_id,email))
     return results
 	
 def createAuction(amount,close_date):
