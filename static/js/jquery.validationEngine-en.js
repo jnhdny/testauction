@@ -170,6 +170,13 @@
                     "alertText2": "Expected Format: ",
                     "alertText3": "mm/dd/yyyy hh:mm:ss AM|PM or ", 
                     "alertText4": "yyyy-mm-dd hh:mm:ss AM|PM"
+	            },
+	            "funkyDate": {
+	                "regex": /(^(([0-9]|[1][0-9]|[2][0-4]) day[s]?) (([0-9]|[1][0-9]|[2][0-4]) hour[s]?) (([0-9]|[1-5][0-9]|(60)) minute[s]?)$)|(^(([0-9]|[1][0-9]|[2][0-4]) day[s]?) (([0-9]|[1-5][0-9]|(60)) minute[s]?)$)|(^(([0-9]|[1][0-9]|[2][0-4]) day[s]?)$)|(^(([0-9]|[1][0-9]|[2][0-4]) day[s]?) (([0-9]|[1][0-9]|[2][0-4]) hour[s]?)$)|(^((([0-9]|[1][0-9]|[2][0-4]) hour[s]?) (([0-9]|[1-5][0-9]|(60)) minute[s]?))$)|(^(([0-9]|[1][0-9]|[2][0-4]) hour[s]?)$)|(^(([0-9]|[1-5][0-9]|(60)) minute[s]?)$)/,
+                    "alertText": "* Invalid Date or Date Format",
+                    "alertText2": "Expected Format: ",
+                    "alertText3": "21 days 4 minutes or ", 
+                    "alertText4": "3 days 3 hours 44 minutes"
 	            }
 	            
             };

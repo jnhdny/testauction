@@ -42,6 +42,7 @@ def bidDetails(auction_id, email):
 def createAuction(amount,close_date):
     #Check if there is enough money in CBN account and then create an auction
     dav = runQuery('''select dollarbalance from x_user where email=%s''',(CBN_ACCOUNT))[0][0]
+    close_date = getDate(close_date)
     if Decimal(amount) <= dav:
         c = tt.cursor()
         c.execute('''insert into x_auction (dollars,close_date) values (%s,%s);''',(amount,close_date))
@@ -70,15 +71,15 @@ def bid(email, id, amount, rate):
 
 def login(email,password):
 	pp = runQuery('''select password,isvalid,salt from x_user where email=%s;''', (email,))
-	hexhash = hashlib.sha512((password+pp[0][2]).encode("utf-8")).hexdigest()
 	try:
+		hexhash = hashlib.sha512((password+pp[0][2]).encode("utf-8")).hexdigest()
 		if hexhash == pp[0][0]:
 			if pp[0][1] == 1:
 				return 1
 			if pp[0][1] == 0:
 				return 2
 	except:
-		raise
+		pass
 	else:
 		return 0
 
@@ -137,4 +138,28 @@ def validate(email,code):
         return 1
     else:
         return 0
-    
+
+def getDay(st):
+    st = [a.strip("s") for a in st.strip().split()]
+    try:
+        return int( st[(st.index("day")) - 1] )
+    except:
+        return 0
+
+def getHour(st):
+    st = [a.strip("s") for a in st.strip().split()]
+    try:
+        return int( st[(st.index("hour")) - 1] )
+    except:
+        return 0
+
+def getMinute(st):
+    st = [a.strip("s") for a in st.strip().split()]
+    try:
+        return int( st[(st.index("minute")) - 1] )
+    except:
+        return 0
+
+
+def getDate(st):
+    return (datetime.datetime.now()+datetime.timedelta(days=getDay(st),hours=getHour(st), minutes=getMinute(st))).strftime("%Y-%m-%d %H:%M:%S")
