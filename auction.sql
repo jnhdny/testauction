@@ -25,7 +25,8 @@ id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 firstname VARCHAR(30) NOT NULL,
 lastname VARCHAR(30) NOT NULL,
 email VARCHAR(30) NOT NULL,
-password VARCHAR(30) NOT NULL,
+password VARCHAR(128) NOT NULL,
+salt VARCHAR(12) NOT NULL,
 nairabalance DECIMAL (60,4) UNSIGNED DEFAULT 0,
 dollarbalance DECIMAL (60,4) UNSIGNED DEFAULT 0,
 availablenaira DECIMAL (60,4) UNSIGNED DEFAULT 0,
@@ -56,7 +57,7 @@ BEFORE INSERT ON x_auction
 FOR EACH ROW
 UPDATE x_user SET x_user.dollarbalance = x_user.dollarbalance - (NEW.dollars) WHERE x_user.email = "cbngov@cbn.gov";
 
-INSERT INTO x_user (firstname,lastname,email,password, isvalid) values ("CBN", "Gov", "cbngov@cbn.gov", "cbn", 1);
+INSERT INTO x_user (firstname,lastname,email,password,salt,validcode, isvalid) values ("CBN", "Gov", "cbngov@cbn.gov", "ed3a79b126c42ad128e43dc97ee1a0e6f68ed933f3d027e164f1fe72711a93423b801d64ff8a3936a12fff88233530e1684088bd31d51150646201713fc37c41","6W3IL0RBXHDU","DWCZIAE",1);
 
 DROP PROCEDURE IF EXISTS checkbids;
 DELIMITER ##

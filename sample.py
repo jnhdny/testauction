@@ -1,9 +1,10 @@
-import pymysql, random, string, datetime
+import pymysql, random, string, datetime,hashlib
 from decimal import *
 import smtplib
 from email.mime.text import MIMEText
 tt = pymysql.connect("127.0.0.1","root","","testauction")
 CBN_ACCOUNT = "cbngov@cbn.gov"
+WEB_ADDRESS = "127.0.0.1:8080"
 
 
 # Ignacio's random string generator from
@@ -66,15 +67,16 @@ def bid(email, id, amount, rate):
         return 0
 
 def login(email,password):
-	pp = runQuery('''select password,isvalid from x_user where email=%s;''', (email,))
+	pp = runQuery('''select password,isvalid,salt from x_user where email=%s;''', (email,))
+	hexhash = hashlib.sha512((password+pp[0][2]).encode("utf-8")).hexdigest()
 	try:
-		if pp[0][0] == password:
-		    if pp[0][1] == 1:
-			    return 1
-		    if pp[0][1] == 0:
-		        return 2
+		if hexhash == pp[0][0]:
+			if pp[0][1] == 1:
+				return 1
+			if pp[0][1] == 0:
+				return 2
 	except:
-		pass
+		raise
 	else:
 		return 0
 
@@ -93,18 +95,21 @@ def dollarRemove(email,amount):
 def createUser(firstname,lastname,email,password):
     '''return 0 if user creation fails because of Duplicate entry'''
     vcode = id_generator(7)
+    salt = id_generator(12)
+    hexhash = hashlib.sha512((password+salt).encode("utf-8")).hexdigest()
     try:
-        runQuery('''insert into x_user (firstname,lastname,email,password,validcode,validexpiry) values (%s,%s,%s,%s,%s,NOW()+INTERVAL 2 HOUR)''',(firstname,lastname,email,password,vcode))
+        runQuery('''insert into x_user (firstname,lastname,email,password,salt,validcode,validexpiry) values (%s,%s,%s,%s,%s,%s,NOW()+INTERVAL 2 HOUR)''',(firstname,lastname,email,hexhash,salt,vcode))
     except:
         raise
     emailstring = '''Dear %s %s,
 An account has been created with this email at the CBN dollar auction site.
-Go to http://50.56.90.80:8080/emailvalidate?email=%s&code=%s to validate your email address with this validation code %s.
-Thank you.'''%(firstname,lastname,email,vcode,vcode)
+Go to http://%s/emailvalidate?email=%s&code=%s to validate your email address.
+ALternatively, login and use this validation code %s.
+Thank you.'''%(firstname,lastname,WEB_ADDRESS,email,vcode,vcode)
     try:
         sendEmail(emailstring, email)
     except:
-        pass
+        raise
     return 1
 
 def sendEmail(emailstring,email):

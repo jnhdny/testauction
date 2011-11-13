@@ -201,7 +201,7 @@ class TestAuction:
         if not sample.validate(email,code):
             return "Invalid validation code"
         else:
-            return "Validation successful. Click <a href="/signin">here</a> to sign in."
+            return '''Validation successful. Click <a href="/signin">here</a> to sign in.'''
     
     @cherrypy.tools.mako(filename="validate.html")
     @cherrypy.expose    
