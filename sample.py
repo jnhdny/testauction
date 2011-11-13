@@ -97,9 +97,14 @@ def createUser(firstname,lastname,email,password):
         runQuery('''insert into x_user (firstname,lastname,email,password,validcode,validexpiry) values (%s,%s,%s,%s,%s,NOW()+INTERVAL 2 HOUR)''',(firstname,lastname,email,password,vcode))
     except:
         raise
-    emailstring = '''An account has been created with this email at the CBN dollar auction site.
-    Go to http://50.56.90.80:8080/emailvalidate?email=%s&code=%s to validate your email address with this validation code %s'''%(email,vcode,vcode)
-    sendEmail(emailstring, email)
+    emailstring = '''Dear %s %s,
+An account has been created with this email at the CBN dollar auction site.
+Go to http://50.56.90.80:8080/emailvalidate?email=%s&code=%s to validate your email address with this validation code %s.
+Thank you.'''%(firstname,lastname,email,vcode,vcode)
+    try:
+        sendEmail(emailstring, email)
+    except:
+        pass
     return 1
 
 def sendEmail(emailstring,email):
