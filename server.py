@@ -196,6 +196,13 @@ class TestAuction:
         else:
             raise cherrypy.HTTPRedirect("/")
     
+    @cherrypy.expose
+    def emailvalidate(self,email,code):
+        if not sample.validate(email,code):
+            return "Invalid validation code"
+        else:
+            return "Validation successful. Click <a href="/signin">here</a> to sign in."
+    
     @cherrypy.tools.mako(filename="validate.html")
     @cherrypy.expose    
     def validate(self):

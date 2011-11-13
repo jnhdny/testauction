@@ -98,13 +98,13 @@ def createUser(firstname,lastname,email,password):
     except:
         raise
     emailstring = '''An account has been created with this email at the CBN dollar auction site.
-    Go to http://50.56.90.80:8080 to validate your email address with this validation code %s'''%vcode
+    Go to http://50.56.90.80:8080/emailvalidate?email=%s&code=%s to validate your email address with this validation code %s'''%(email,vcode,vcode)
     sendEmail(emailstring, email)
     return 1
 
 def sendEmail(emailstring,email):
     msg = MIMEText(emailstring)
-    msg['Subject'] = 'The contents of blah"
+    msg['Subject'] = "Verification Email"
     msg['From'] = "admin@places.com.ng"
     msg['To'] = email
     s = smtplib.SMTP('localhost')
