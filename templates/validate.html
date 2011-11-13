@@ -1,0 +1,60 @@
+<html>
+<head>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <%include file="header.html"/>
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    <title>Validate Email</title>
+    <script>
+            jQuery(document).ready(function(){
+                // binds form submission and fields to the validation engine
+                jQuery("#nairareload").validationEngine();
+            });
+            function checkHELLO(field, rules, i, options){
+                if (field.val() != "HELLO") {
+                    // this allows to use i18 for the error msgs
+                    return options.allrules.validate2fields.alertText;
+                }
+            }
+</script>
+
+</head>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/createauction">New Auction</a></li>
+            <li><a href="/past">Past Auctions</a></li>
+            <li class="active"><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${email}</p>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Validate Email</h2>
+    	</div>
+    	<div class="row">
+			<div class="span6">
+			     <p>An email has been sent to ${email} to verify that you own that address.
+			     Please click on the link to verify your email and start using the site, or enter the
+			     validation code in the email here.</p>
+			     
+			     <form method="POST" action="/xvalidate">	     
+			         <div>
+			         <input class="xlarge validate[required]" name="validcode" id="validcode" size="20" type="text"><br><br>
+			         <input type="submit" value="Validate" class="btn primary">
+			         </div>
+			     </form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

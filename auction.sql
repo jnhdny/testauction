@@ -29,6 +29,9 @@ password VARCHAR(30) NOT NULL,
 nairabalance DECIMAL (60,4) UNSIGNED DEFAULT 0,
 dollarbalance DECIMAL (60,4) UNSIGNED DEFAULT 0,
 availablenaira DECIMAL (60,4) UNSIGNED DEFAULT 0,
+isvalid TINYINT NOT NULL DEFAULT 0,
+validcode VARCHAR(7),
+validexpiry TIMESTAMP,
 UNIQUE (email)
 ) ENGINE=InnoDB;
 
@@ -53,7 +56,7 @@ BEFORE INSERT ON x_auction
 FOR EACH ROW
 UPDATE x_user SET x_user.dollarbalance = x_user.dollarbalance - (NEW.dollars) WHERE x_user.email = "cbngov@cbn.gov";
 
-INSERT INTO x_user (firstname,lastname,email,password) values ("CBN", "Gov", "cbngov@cbn.gov", "cbn");
+INSERT INTO x_user (firstname,lastname,email,password, isvalid) values ("CBN", "Gov", "cbngov@cbn.gov", "cbn", 1);
 
 DROP PROCEDURE IF EXISTS checkbids;
 DELIMITER ##

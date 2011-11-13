@@ -48,8 +48,11 @@ cherrypy.config.update({'tools.sessions.on':True, 'tools.mako.collection_size' :
 def authorized():
     ''' Redirects to login page if not logged on, else returns logged on user email'''
     email = cherrypy.session.get('email')
+    isvalid = cherrypy.session.get('isvalid')
     if not email:
         raise cherrypy.HTTPRedirect("/signin")
+    if not isvalid:
+        raise cherrypy.HTTPRedirect("/validate")
     return email
 
 class TestAuction:
@@ -63,10 +66,15 @@ class TestAuction:
 #Login POST function
     @cherrypy.expose
     def login(self,email,password):
-        d = cherrypy.request.headers
-        if sample.login(email,password):
+        valid_status = sample.login(email,password)
+        if valid_status == 1:
             cherrypy.session['email']=email
+            cherrypy.session['isvalid'] = 1
             raise cherrypy.HTTPRedirect("/")
+        if valid_status == 2:
+            cherrypy.session['email'] = email
+            cherrypy.session['isvalid'] = 0
+            raise cherrypy.HTTPRedirect("/validate")
         else:
             return "Login failed"
 
@@ -85,7 +93,7 @@ class TestAuction:
 
     @cherrypy.expose
     @cherrypy.tools.mako(filename="testauction.html")
-    def auction (self,id):
+    def auction (self,id=1):
         '''Auction page shows details of auction and allows bid if auction is open'''
         email = authorized()
         aa = sample.auctionDetails(id)
@@ -108,12 +116,6 @@ class TestAuction:
         aa = sample.userDetails(email)
         return {'user':aa}
 	
-    @cherrypy.tools.mako(filename="nairareload.html")
-    @cherrypy.expose
-    def refill(self):
-        email = authorized()
-        return {'email':email}
-    
     @cherrypy.expose
     def nairareload(self,amount):
         '''Takes amount to add via POST. Also accepts negative numbers.'''
@@ -168,7 +170,7 @@ class TestAuction:
     	#Will eventually validate email here as well
     	    if sample.createUser(firstname,lastname,email,password):
     	        self.login(email,password)
-    	        raise cherrypy.HTTPRedirect("/")
+    	        raise cherrypy.HTTPRedirect("/validate")
     	    else:
     	        return '''Account with this email exists'''
     	else:
@@ -182,10 +184,28 @@ class TestAuction:
         return {'email':email, 'oldauctions':oldauctions}
 
 
+    @cherrypy.expose
+    def xvalidate(self,validcode):
+        if cherrypy.session.get('email'):
+            email = cherrypy.session.get('email')
+            if not sample.validate(email,validcode):
+                return "Invalid validation code"
+            else:
+                cherrypy.session['isvalid'] = 1
+                raise cherrypy.HTTPRedirect("/")
+        else:
+            raise cherrypy.HTTPRedirect("/")
+    
+    @cherrypy.tools.mako(filename="validate.html")
+    @cherrypy.expose    
+    def validate(self):
+        email = cherrypy.session.get('email')
+        isvalid = cherrypy.session.get('isvalid')
+        return {'email':email,'isvalid':isvalid}
 
 def defaulterror(status, message, traceback, version):
     return "An Error has occurred"
-cherrypy.config.update({'error_page.default': defaulterror})
+#cherrypy.config.update({'error_page.default': defaulterror})
 
 tconf = {'/':
 	{'tools.staticdir.root':current_dir

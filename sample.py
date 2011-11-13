@@ -1,7 +1,15 @@
-import pymysql
+import pymysql, random, string, datetime
 from decimal import *
+import smtplib
+from email.mime.text import MIMEText
 tt = pymysql.connect("127.0.0.1","root","","testauction")
 CBN_ACCOUNT = "cbngov@cbn.gov"
+
+
+# Ignacio's random string generator from
+# http://stackoverflow.com/questions/2257441/python-random-string-generation-with-upper-case-letters-and-digits
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
 
 def runQuery(query, parameters):
 	c = tt.cursor()
@@ -58,10 +66,13 @@ def bid(email, id, amount, rate):
         return 0
 
 def login(email,password):
-	pp = runQuery('''select password from x_user where email=%s;''', (email,))
+	pp = runQuery('''select password,isvalid from x_user where email=%s;''', (email,))
 	try:
 		if pp[0][0] == password:
-			return 1
+		    if pp[0][1] == 1:
+			    return 1
+		    if pp[0][1] == 0:
+		        return 2
 	except:
 		pass
 	else:
@@ -81,11 +92,24 @@ def dollarRemove(email,amount):
 
 def createUser(firstname,lastname,email,password):
     '''return 0 if user creation fails because of Duplicate entry'''
+    vcode = id_generator(7)
     try:
-        runQuery('''insert into x_user (firstname,lastname,email,password) values (%s,%s,%s,%s)''',(firstname,lastname,email,password))
+        runQuery('''insert into x_user (firstname,lastname,email,password,validcode,validexpiry) values (%s,%s,%s,%s,%s,NOW()+INTERVAL 2 HOUR)''',(firstname,lastname,email,password,vcode))
     except:
-        return 0
+        raise
+    emailstring = '''An account has been created with this email at the CBN dollar auction site.
+    Go to http://50.56.90.80:8080 to validate your email address with this validation code %s'''%vcode
+    sendEmail(emailstring, email)
     return 1
+
+def sendEmail(emailstring,email):
+    msg = MIMEText(emailstring)
+    msg['Subject'] = 'The contents of blah"
+    msg['From'] = "admin@places.com.ng"
+    msg['To'] = email
+    s = smtplib.SMTP('localhost')
+    s.sendmail("admin@places.com.ng", [email], msg.as_string())
+    s.quit()
 
 def oldAuctions():
     results = runQuery('''select close_date, dollars, sold, rate, status, id from x_auction where status=2;''', ())
@@ -94,6 +118,11 @@ def oldAuctions():
         rr.append(dict(zip(["close_date", "dollars", "sold", "rate", "status", "id"], i)))
     return rr
 
-
-
+def validate(email,code):
+    rr = runQuery('''select validcode from x_user where email=%s''', (email,))
+    if rr[0][0] == code:
+        runQuery('''update x_user set isvalid=1 where email=%s''',(email,))
+        return 1
+    else:
+        return 0
     
