@@ -163,3 +163,17 @@ def getMinute(st):
 
 def getDate(st):
     return (datetime.datetime.now()+datetime.timedelta(days=getDay(st),hours=getHour(st), minutes=getMinute(st))).strftime("%Y-%m-%d %H:%M:%S")
+
+def getTimeLeft(tt):
+    diff = tt - datetime.datetime.now()
+    hours,minutes,seconds = (0,0,0)
+    if diff.seconds > 60:
+        minutes,seconds = divmod(diff.seconds,60)
+        if minutes > 60:
+            hours,minutes = divmod(minutes,60)
+    datestring = ""
+    if hours:
+        datestring = str(hours) + " hours "
+    if minutes:
+        datestring = datestring+ str(minutes)+ " minutes "
+    return datestring
