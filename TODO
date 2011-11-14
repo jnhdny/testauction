@@ -1,3 +1,6 @@
-1. A sign up page
-5. Get a proper Dispatcher??
-6. Passwords stored in clear text in MySQL database. Login can be brute forced. No account lockouts implemented.
+* Get a proper Dispatcher??
+* Login can be brute forced. No account lockouts implemented.
+* Past Auctions page should show winners for CBN account
+* Remove money operations are not safe. Would be nice if they have an additional warning?
+* How do I validate input into functions? Client-side code not enough. Malicious clients can send bad data. What will the website do?
+  How do I make it fail gracefully?

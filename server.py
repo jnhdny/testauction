@@ -1,3 +1,5 @@
+# I do not like this code
+
 import cherrypy,os.path
 import sample
 from mako.lookup import TemplateLookup
@@ -67,12 +69,11 @@ def authorized():
 
 class TestAuction:
 	@cherrypy.expose
-	@cherrypy.tools.mako(filename="testindex.html")
+	@cherrypy.tools.mako(filename="index.html")
 	def index(self):
 		email,token = authorized()
 		openauctions = sample.runQuery('''select id, dollars, close_date from x_auction where status=0''',())
 		return {'email' : email, 'openauctions' : openauctions}
-	
 
 	@cherrypy.tools.allow(methods=['POST'])
 	@cherrypy.expose
@@ -99,12 +100,12 @@ class TestAuction:
 		raise cherrypy.HTTPRedirect("/")
 	
 	@cherrypy.expose
-	@cherrypy.tools.mako(filename="test.html")
+	@cherrypy.tools.mako(filename="login.html")
 	def signin(self):
 		return {}
 
 	@cherrypy.expose
-	@cherrypy.tools.mako(filename="testauction.html")
+	@cherrypy.tools.mako(filename="auction.html")
 	def auction (self,id=1):
 		'''Auction page shows details of auction and allows bid if auction is open'''
 		email,token = authorized()
@@ -124,7 +125,7 @@ class TestAuction:
 		else:
 			return '''<html>Bid unsuccessful<br><a href="/auction/%s">Return to Auction</a></html>'''%id
 	
-	@cherrypy.tools.mako(filename="testaccount.html")
+	@cherrypy.tools.mako(filename="account.html")
 	@cherrypy.expose
 	def account(self):
 		email,token=authorized()
@@ -172,8 +173,7 @@ class TestAuction:
 			sample.dollarRemove(email,amount)
 		raise cherrypy.HTTPRedirect("/account")
 	
-	@cherrypy.tools.mako(filename="testcreate.html")
-	#@cherrypy.tools.mako(filename="createauction.html")
+	@cherrypy.tools.mako(filename="create.html")
 	@cherrypy.expose
 	def createauction(self):
 		email,token = authorized()
@@ -189,14 +189,12 @@ class TestAuction:
 		sample.createAuction(amount,closedate)
 		raise cherrypy.HTTPRedirect("/createauction")
 		
-	@cherrypy.tools.mako(filename="testsignup.html")
+	@cherrypy.tools.mako(filename="signup.html")
 	@cherrypy.expose
 	def signup(self):
 		cherrypy.session["token"]=sample.id_generator(12)
 		return {'token':token}
 
-
-#Receives POST data!!!!
 	@cherrypy.tools.allow(methods=['POST'])
 	@cherrypy.expose
 	def register(self,firstname,lastname,email,password,c_password,ctoken):
@@ -212,15 +210,13 @@ class TestAuction:
 		else:
 			return "User account creation failed"
 	
-	@cherrypy.tools.mako(filename="testpast.html")
+	@cherrypy.tools.mako(filename="past.html")
 	@cherrypy.expose
 	def past(self):
 		email,token=authorized()
 		oldauctions = sample.oldAuctions()
 		return {'email':email, 'oldauctions':oldauctions, 'token':token}
 
-
-#Receives POST data!!!!
 	@cherrypy.tools.allow(methods=['POST'])
 	@cherrypy.expose
 	def xvalidate(self,validcode,ctoken):
@@ -245,8 +241,7 @@ class TestAuction:
 				return '''Validation successful. Click <a href="/signin">here</a> to sign in.'''
 		else:
 			raise cherrypy.HTTPRedirect("/signin")
-
-#Has a Form!!!!!	
+	
 	@cherrypy.tools.mako(filename="validate.html")
 	@cherrypy.expose	
 	def validate(self):

@@ -68,7 +68,13 @@ u = sample.userDetails(email)
 						% else:
 						Closed at:
 						%endif
-						</strong></td> <td>${sample.getTimeLeft(auction["close_date"])}</td>
+						</strong></td> <td>
+						% if auction["status"] == 0:
+						${sample.getTimeLeft(auction["close_date"])}
+						% else:
+						${auction["close_date"]}
+						%endif
+						</td>
 						</tr>
 						</table>
 						% 	if auction["status"] == 0 and email != "cbngov@cbn.gov":

@@ -1,24 +1,53 @@
 <html>
+<%
+import sample
+%>
 <head>
-<title>Auctions</title>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    <title>Dollar Auction</title>
 </head>
-<body style="font-family: verdana, arial, sans-serif;">
-<h3>Open Auctions</h2>
-<table>
-<tr>
-<td><b>ID</b></td>
-<td><b>Amount</b><td>
-<td><b>Closing Time</b></td>
-</tr>
-%	for a in openauctions:
-		<tr>
-		<td><a href="auction/${a[0]}">${a[0]}</a></td>
-		<td>${a[1]}<td>
-		<td>${a[2]}</td>
-		</tr>
-%	endfor
-</table>
-<p><a href="/createauction">Create Auction</a></p>
-<p>Logged in as <a href="/account">${email}</a> <a href="/logout">Logout</a></p>
-</body>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/createauction">New Auction</a></li>
+            <li><a href="/past">Past Auctions</a></li>
+            <li><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${email}</p>
+        </div>
+      </div>
+    </div>   
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Open Auctions</h2>
+    	</div>
+		<div class="row">
+			<div class="span8">
+    			<table>
+					<tr>
+						<td><strong>Amount ($)</strong><td>
+						<td><strong>Closes In</strong></td>
+						<td><strong></strong></td>
+					</tr>
+					%	for a in openauctions:
+							<tr>
+							<td>${a[1]}<td>
+							<td>${sample.getTimeLeft(a[2])}</td>
+							<td><a href="auction/${a[0]}">Bid</a></td>
+							</tr>
+					%	endfor
+				</table>
+			</div>
+		</div>
+    </div>
+<body>
 </html>

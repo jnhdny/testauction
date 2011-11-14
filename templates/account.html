@@ -1,26 +1,178 @@
 <html>
 <head>
-<title>Your Account</title>
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+    <%include file="header.html"/>
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    <title>Account</title>
+    <script>
+            jQuery(document).ready(function(){
+                // binds form submission and fields to the validation engine
+                jQuery("#nairareload").validationEngine();
+                jQuery("#dollarremove").validationEngine();
+                jQuery("#dollarreload").validationEngine();
+                jQuery("#nairaremove").validationEngine();
+            });
+            function checkHELLO(field, rules, i, options){
+                if (field.val() != "HELLO") {
+                    // this allows to use i18 for the error msgs
+                    return options.allrules.validate2fields.alertText;
+                }
+            }
+</script>
+
 </head>
-<body style="font-family: verdana, arial, sans-serif;">
-<h3>Wallet</h3>
-<table>
-<tr>
-<td>Naira:</td>
-<td>${user["nairabalance"]}<td>
-<td><a href="/refill">Refill</a></td>
-</tr>
-<tr>
-<td>Dollars</td>
-<td>${user["dollarbalance"]}<td>
-<td><a href="./#">Withdraw</a></td>
-</tr>
-<tr>
-<td>Available naira:</td>
-<td>${user["availablenaira"]}<td>
-<td></td>
-</tr>
-</table>
-<p>Logged in as <a href="/account">${user["email"]}</a> <a href="/logout">Logout</a></p>
-</body>
+<body>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Dollar Auction</a>
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/createauction">New Auction</a></li>
+            <li><a href="/past">Past Auctions</a></li>
+            <li class="active"><a href="/account">Account</a></li>
+          </ul>
+          <p class="pull-right">${user["email"]}</p>
+        </div>
+      </div>
+    </div>   
+    <div class="container">
+    	<div class="page-header">
+    	<h2>Your Account</h2>
+    	</div>
+    	<div class="row">
+			<div class="span6">
+			%if user["email"] == "cbngov@cbn.gov":
+				<table>
+				<tr>
+					<td><strong>Naira:</strong></td>
+					<td>&#8358;${user["nairabalance"]}<td>
+					<td><button data-controls-modal="modal-nairaremove" data-backdrop="true" data-keyboard="true" class="btn small primary">Remove</button></td>
+				</tr>
+				<tr>
+					<td><strong>Dollars</strong></td>
+					<td>$${user["dollarbalance"]}<td>
+					<td><button data-controls-modal="modal-dollarreload" data-backdrop="true" data-keyboard="true" class="btn small primary">Reload</button></td>
+				</tr>
+				</table>
+			%else:
+				<table>
+				<tr>
+					<td><strong>Naira:</strong></td>
+					<td>&#8358;${user["nairabalance"]}<td>
+					<td><button data-controls-modal="modal-nairareload" data-backdrop="true" data-keyboard="true" class="btn small primary">Reload</button></td>
+				</tr>
+				<tr>
+					<td><strong>Dollars</strong></td>
+					<td>$${user["dollarbalance"]}<td>
+					<td><button data-controls-modal="modal-dollarremove" data-backdrop="true" data-keyboard="true" class="btn small primary">Remove</button></td>
+				</tr>
+				<tr>
+					<td><strong>Available naira:</strong></td>
+					<td>&#8358;${user["availablenaira"]}<td>
+					<td></td>
+					</tr>
+				</table>
+			%endif
+			</div>
+		</div>
+		<div class="row">
+			<div class="span6">
+			
+<form action="/logout" method="POST"> <input type="hidden" value="${token}" name="ctoken"/><input type="submit" value="Logout" class="btn primary"/></form>
+			</div>
+		</div>
+    </div>
+    %if user["email"] != "cbngov@cbn.gov":
+        <div id="modal-nairareload" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Reload Naira</h3>
+            </div>
+            <div class="modal-body">
+            <form id="nairareload" method="POST" action="/nairareload">
+            <input type="hidden" name="ctoken" value=${token} />
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Reload" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+		<div id="modal-dollarremove" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Withdraw Dollars</h3>
+            </div>
+            <div class="modal-body">
+            <form id="dollarremove" method="POST" action="/dollarremove">
+            <input type="hidden" name="ctoken" value=${token} />
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Remove" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+    %else:
+        <div id="modal-dollarreload" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Reload Dollars</h3>
+            </div>
+            <div class="modal-body">
+            <form id="dollarreload" method="POST" action="/dollarreload">
+            <input type="hidden" name="ctoken" value=${token} />
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Reload" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+        <div id="modal-nairaremove" class="modal hide fade" style="display: none; ">
+            <div class="modal-header">
+              <a href="#" class="close">x</a>
+              <h3>Withdraw Naira</h3>
+            </div>
+            <div class="modal-body">
+            <form id="nairaremove" method="POST" action="/nairaremove">
+            <input type="hidden" name="ctoken" value=${token} />
+			<div class="clearfix">    
+            	<label for="xlInput">Amount:</label>
+            	<div class="input">
+              		<input class="xlarge validate[required, custom[unsignednumber]" id="xlInput" name="amount" size="20" type="text">
+            	</div>
+            </div>
+            	<div class="input">
+            		<input type="submit" value="Remove" class="btn primary" />
+            	</div>
+            
+			</form>
+            </div>
+        </div>
+    %endif
+<body>
 </html>
