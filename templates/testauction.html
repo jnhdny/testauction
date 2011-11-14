@@ -74,6 +74,7 @@ u = sample.userDetails(email)
 						% 	if auction["status"] == 0 and email != "cbngov@cbn.gov":
 								<p>You have N${u["availablenaira"]} available</p>
             	<form id="formbid" method="POST" action="/bid" class="form-stacked">
+            	<input type="hidden" name="ctoken" value=${token} />
 					<input type="hidden" name="id" value=${auction["id"]}>
 					<div class="clearfix">
 						<label for="xlInput">Amount:</label>

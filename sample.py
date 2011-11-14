@@ -161,7 +161,6 @@ def getMinute(st):
     except:
         return 0
 
-
 def getDate(st):
     return ( datetime.datetime.now() + datetime.timedelta(days=getDay(st),hours=getHour(st), minutes=getMinute(st)) ).strftime("%Y-%m-%d %H:%M:%S")
 
