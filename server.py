@@ -257,7 +257,7 @@ class TestAuction:
 def defaulterror(status, message, traceback, version):
 	return "An Error has occurred"
 
-#cherrypy.config.update({'error_page.default': defaulterror})
+cherrypy.config.update({'error_page.default': defaulterror})
 
 tconf = {'/':
 	{'tools.staticdir.root':current_dir
