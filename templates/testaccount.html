@@ -50,7 +50,7 @@
 				<table>
 				<tr>
 					<td><strong>Naira:</strong></td>
-					<td>${user["nairabalance"]}<td>
+					<td>&#8358;${user["nairabalance"]}<td>
 					<td><button data-controls-modal="modal-nairaremove" data-backdrop="true" data-keyboard="true" class="btn small primary">Remove</button></td>
 				</tr>
 				<tr>
@@ -63,7 +63,7 @@
 				<table>
 				<tr>
 					<td><strong>Naira:</strong></td>
-					<td>N${user["nairabalance"]}<td>
+					<td>&#8358;${user["nairabalance"]}<td>
 					<td><button data-controls-modal="modal-nairareload" data-backdrop="true" data-keyboard="true" class="btn small primary">Reload</button></td>
 				</tr>
 				<tr>
@@ -73,7 +73,7 @@
 				</tr>
 				<tr>
 					<td><strong>Available naira:</strong></td>
-					<td>N${user["availablenaira"]}<td>
+					<td>&#8358;${user["availablenaira"]}<td>
 					<td></td>
 					</tr>
 				</table>
@@ -82,7 +82,8 @@
 		</div>
 		<div class="row">
 			<div class="span6">
-			<a href="/logout">Logout</a>
+			
+<form action="/logout" method="POST"> <input type="hidden" value="${token}" name="ctoken"/><input type="submit" value="Logout" class="btn primary"/></form>
 			</div>
 		</div>
     </div>

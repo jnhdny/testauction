@@ -90,9 +90,12 @@ class TestAuction:
 			return "Login failed"
 
 #Logout, redirects to home page and to Login page
+	#@cherrypy.tools.allow(methods=['POST'])
 	@cherrypy.expose
-	def logout(self):
-		cherrypy.session.delete()
+	def logout(self,ctoken):
+		if ctoken != cherrypy.session.get('token'):
+			return "Security violation"
+		cherrypy.session.clear()
 		raise cherrypy.HTTPRedirect("/")
 	
 	@cherrypy.expose
@@ -174,7 +177,7 @@ class TestAuction:
 	@cherrypy.expose
 	def createauction(self):
 		email,token = authorized()
-		return {'user': sample.userDetails(email)}
+		return {'user': sample.userDetails(email), 'token':token}
 
 	@cherrypy.tools.allow(methods=['POST'])
 	@cherrypy.expose
@@ -254,7 +257,7 @@ class TestAuction:
 def defaulterror(status, message, traceback, version):
 	return "An Error has occurred"
 
-cherrypy.config.update({'error_page.default': defaulterror})
+#cherrypy.config.update({'error_page.default': defaulterror})
 
 tconf = {'/':
 	{'tools.staticdir.root':current_dir
@@ -265,4 +268,3 @@ cherrypy.tree.mount(TestAuction(), "/", tconf)
 cherrypy.engine.start()
 cherrypy.engine.block()
 #cherrypy.quickstart(TestAuction())
-
