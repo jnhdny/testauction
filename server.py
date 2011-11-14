@@ -212,7 +212,7 @@ class TestAuction:
 	@cherrypy.tools.mako(filename="testpast.html")
 	@cherrypy.expose
 	def past(self):
-		email=authorized()
+		email,token=authorized()
 		oldauctions = sample.oldAuctions()
 		return {'email':email, 'oldauctions':oldauctions, 'token':token}
 

@@ -59,7 +59,7 @@ u = sample.userDetails(email)
 				%	else:
 						<table>
 						<tr>
-						<td><strong>Amount:</strong></td> <td>$${auction["dollars"]}</td>
+						<td><strong>Amount ($):</strong></td> <td>${auction["dollars"]}</td>
 						</tr>
 						<tr>
 						<td><strong>
@@ -77,11 +77,11 @@ u = sample.userDetails(email)
             	<input type="hidden" name="ctoken" value=${token} />
 					<input type="hidden" name="id" value=${auction["id"]}>
 					<div class="clearfix">
-						<label for="xlInput">Amount:</label>
+						<label for="xlInput">Amount ($):</label>
 						<div class="input"><input id ="am" class = "validate[required,custom[number]]" name="amount" type="text"></div>
 					</div>
 					<div class="clearfix">
-						<label for="xlInput">Rate:</label>
+						<label for="xlInput">Rate (N/$):</label>
 						<div class="input"><input id="ra" class = "validate[required,custom[number]]" name="rate" type="text"></div>
 					</div>
 					
