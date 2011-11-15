@@ -146,31 +146,28 @@ def sendEmail(emailstring,email):
     s.sendmail(MAIL_ADDRESS, [email], msg.as_string())
     s.quit()
 
-# These are functions for doing the datetime magic. 
-# I'm not sure a module in the standard library doesn't have similar capabilities
-# Why do this over and over again?
+# I don't like these functions
+
 def getDay(st):
-    st = [a.strip("s") for a in st.strip().split()]
     try:
         return int( st[(st.index("day")) - 1] )
     except:
         return 0
 
 def getHour(st):
-    st = [a.strip("s") for a in st.strip().split()]
     try:
         return int( st[(st.index("hour")) - 1] )
     except:
         return 0
 
 def getMinute(st):
-    st = [a.strip("s") for a in st.strip().split()]
     try:
         return int( st[(st.index("minute")) - 1] )
     except:
         return 0
 
 def getDate(st):
+    st = [a.strip("s") for a in st.strip().split()]
     return ( datetime.datetime.now() + datetime.timedelta(days=getDay(st),hours=getHour(st), minutes=getMinute(st)) ).strftime("%Y-%m-%d %H:%M:%S")
 
 # Functions should do what they say, only

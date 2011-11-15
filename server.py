@@ -1,5 +1,3 @@
-# I do not like this code
-
 import cherrypy,os.path
 import sample
 from mako.lookup import TemplateLookup

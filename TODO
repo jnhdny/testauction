@@ -4,3 +4,4 @@
 * Remove money operations are not safe. Would be nice if they have an additional warning?
 * How do I validate input into functions? Client-side code not enough. Malicious clients can send bad data. What will the website do?
   How do I make it fail gracefully?
+* Login form has no token. Session usually tied to user, how do I create tokens for unauthenticated user so login form cannot be attacked?
